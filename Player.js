@@ -11,7 +11,7 @@ function Player(onGround, velocityY, height, width, color, positionX, positionY)
 	this.positionY=positionY;
 
 	this.salta= function(){
-		this.velocityY=7;
+		this.velocityY=10;
 		this.onGround=false;
 		this.positionY-=this.velocityY;
 	}
