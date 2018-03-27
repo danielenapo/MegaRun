@@ -15,4 +15,5 @@ function Player(onGround, velocityY, height, width, color, positionX, positionY)
 		this.onGround=false;
 		this.positionY-=this.velocityY;
 	}
+	
 }

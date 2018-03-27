@@ -1,6 +1,5 @@
 //OGGETTO OSTACOLI
-function Obstacle(velocityX, height, width, color, positionX, positionY){
-	this.velocityX=velocityX;//velocità iniziale, si incrementa con la distanza
+function Obstacle(height, width, color, positionX, positionY){
 	//dati forma fisica
 	this.height=height;
 	this.width=width;
