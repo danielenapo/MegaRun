@@ -6,6 +6,7 @@ function setup(){
 	velocityX=10;
 	obstacleCounter=0;
 	difficultyLevel=[false,false];
+	velocitaProiettili=30;
 	
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=55, width=55, positionX=0;
@@ -14,6 +15,7 @@ function setup(){
 	
 	//INIZIALIZZAZIONE ARRAY DI OSTACOLI
 	obstacles=[];
+	colpi=[];
 	var possibleHeight=[50, 30];//due possibili altezze(alto e basso)
 	var possibleWidth=[30, 50];//due possibili larghezze(stretto e alto)
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
@@ -42,12 +44,23 @@ function draw(){
 		fill(color(obstacles[i].color));
 		rect(obstacles[i].positionX, obstacles[i].positionY, obstacles[i].width, obstacles[i].height);//disegna il personaggio
 	}
+	//STAMPA PROIETTILI
+	for(var i=0; i<colpi.length; i++){
+		colpi[i].positionX+=velocitaProiettili;	//aggiorna la posizione dei proiettili
+		fill(color(colpi[i].color));
+		ellipse(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height);//disegna il personaggio
+	}
 }
 
 function controlli(){
 	//CONTROLLO COMANDI PREMUTI
-	if(mouseIsPressed || keyIsDown(UP_ARROW) ||keyIsDown(32) && player.onGround==true)
-		player.salta();
+	if(mouseIsPressed || keyIsDown(UP_ARROW) ||keyIsDown(32)){
+		if(player.onGround==true)
+			player.salta();
+	}
+	
+	if(keyIsDown(RIGHT_ARROW))
+		spara();
 	
 	//CONTROLLO DIFFICOLTA' DI GIOCO
 	if(obstacleCounter==10 && difficultyLevel[0]==false){
@@ -64,7 +77,7 @@ function controlli(){
 		addObstacle();
 	
 	//AGGIORNA POSIZIONE Y GIOCATORE (SALTO)
-	if(player.positionY<=positionYMin){ 
+	if(player.positionY>=positionYMin){ 
 		player.onGround=true;
 		player.positionY=positionYMin}
 	else
@@ -72,6 +85,12 @@ function controlli(){
 		player.onGround=false;
 		player.positionY-=player.velocityY;
 		player.velocityY-=gravity;
+	}
+	
+	//CONTROLLO PROIETTILI	
+	if(colpi[0]!= undefined){
+		if(colpi[0].positionX>500)
+			colpi.splice(0,1);
 	}
 }
 
@@ -96,4 +115,10 @@ function addObstacle(){
 		obstacleCounter++;
 		$("#counter").text(obstacleCounter+"---"+velocityX);
 	}
+}
+
+function spara(){
+	colpo= new Proiettile(4, 4, "#FFFFFF", player.positionX, player.positionY);
+	colpi.push(colpo);
+	
 }
