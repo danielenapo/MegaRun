@@ -7,11 +7,12 @@ function setup(){
 	obstacleCounter=0;
 	difficultyLevel=[false,false];
 	velocitaProiettili=30;
+	contaSpara=0;
 	
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=55, width=55, positionX=0;
 	positionYMin=300-height-1;			// = grandezza canvas-altezza-1(per non attaccarsi al fondo)
-	player= new Player(true,velocityY, height, width, "#FF0000", positionX, positionYMin);
+	player= new Player(true,velocityY, height, width, "#FF0000", positionX, positionYMin, 100);
 	
 	//INIZIALIZZAZIONE ARRAY DI OSTACOLI
 	obstacles=[];
@@ -38,12 +39,14 @@ function draw(){
 	noStroke();
 	fill(color(player.color));	// riempie il quadrato del colore selezionato
 	rect(player.positionX, player.positionY, player.width, player.height);	//disegna il personaggio
+	
 	//STAMPA OSTACOLI
 	for(var i=0; i<obstacles.length; i++){
 		obstacles[i].positionX-=velocityX;	//aggiorna la posizione degli ostacoli
 		fill(color(obstacles[i].color));
 		rect(obstacles[i].positionX, obstacles[i].positionY, obstacles[i].width, obstacles[i].height);//disegna il personaggio
 	}
+	
 	//STAMPA PROIETTILI
 	for(var i=0; i<colpi.length; i++){
 		colpi[i].positionX+=velocitaProiettili;	//aggiorna la posizione dei proiettili
@@ -53,14 +56,16 @@ function draw(){
 }
 
 function controlli(){
+	contaSpara++;
 	//CONTROLLO COMANDI PREMUTI
 	if(mouseIsPressed || keyIsDown(UP_ARROW) ||keyIsDown(32)){
 		if(player.onGround==true)
 			player.salta();
 	}
-	
-	if(keyIsDown(RIGHT_ARROW))
+	if(keyIsDown(RIGHT_ARROW)&& contaSpara>5){
 		spara();
+		contaSpara=0;
+	}
 	
 	//CONTROLLO DIFFICOLTA' DI GIOCO
 	if(obstacleCounter==10 && difficultyLevel[0]==false){
@@ -118,7 +123,7 @@ function addObstacle(){
 }
 
 function spara(){
-	colpo= new Proiettile(4, 4, "#FFFFFF", player.positionX, player.positionY);
+	colpo= new Proiettile(10, 10, "#F0F0F0", player.positionX+(player.width/2), player.positionY+(player.height/2));
 	colpi.push(colpo);
 	
 }
