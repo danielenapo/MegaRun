@@ -6,15 +6,14 @@ function Player(onGround, velocityY, height, width, color, positionX, positionY,
 	this.height=height;
 	this.width=width;
 	this.color=color;
+	this.health=health;
 	//dati posizione iniziale
 	this.positionX=positionX;
 	this.positionY=positionY;
 
 	this.salta= function(){
-		this.velocityY=11;
+		this.velocityY=13;
 		this.onGround=false;
 		this.positionY-=this.velocityY;
 	}
-
-	
 }
