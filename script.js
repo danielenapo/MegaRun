@@ -9,15 +9,19 @@ function setup(){
 	contaSpara=0;
 	fluttua=0;
 	enemy=new Enemy(false,40, 40, "#0000FF", 460, 200, 20 );
+	larghezzaCanvas=600;
+	lunghezzaCanvas=224;
 
 	//INIZIALIZZAZIONE CANVAS
-	createCanvas(500, 300);		//id="defaultCanvas0"
+	bg=createImg("img/background.gif");
+	bg.position(0,0);
+	createCanvas(larghezzaCanvas, lunghezzaCanvas);		//id="defaultCanvas0"
 	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
 	frameRate(30);
 
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=55, width=55, positionX=0;
-	positionYMin=300-height-1;			// = grandezza canvas-altezza-1(per non attaccarsi al fondo)
+	positionYMin=lunghezzaCanvas-height-1;			// = grandezza canvas-altezza-1(per non attaccarsi al fondo)
 	player= new Player(true,velocityY, height, width, "#FF0000", positionX, positionYMin, 100);
 
 	//INIZIALIZZAZIONE ARRAY DI OSTACOLI
@@ -26,16 +30,15 @@ function setup(){
 	var possibleHeight=[50, 30];//due possibili altezze(alto e basso)
 	var possibleWidth=[30, 50];//due possibili larghezze(stretto e alto)
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
-	var positionYO=300-possibleHeight[type]-1; //laposizione y si calcola come quella del giocatore
+	var positionYO=lunghezzaCanvas-possibleHeight[type]-1; //laposizione y si calcola come quella del giocatore
 	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", 900, positionYO); //istanzia un nuovo ostacolo
 	obstacles.push(obstacle);
-	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", 1500, positionYO); //istanzia un nuovo ostacolo
+	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", larghezzaCanvas+1000, positionYO); //istanzia un nuovo ostacolo
 	obstacles.push(obstacle);
 }
 
 function draw(){
-	background(72);	//cancella il canvas
-	controlli();	//esegue controlli di routine
+	background(52);
 
 //######## AGGIORNAMENTO IMMAGINE CANVAS (draw) ##############
 
@@ -111,7 +114,7 @@ function controlli(){
 
 	//CONTROLLO PROIETTILI
 	if(colpi[0]!= undefined){
-		if(colpi[0].positionX>500)
+		if(colpi[0].positionX>larghezzaCanvas)
 			colpi.splice(0,1);
 			//se i colpi finiscono fuori dal canvas, vengono tolti
 	}
@@ -131,12 +134,12 @@ function addObstacle(){
 	var possibleWidth=[30, 50];
 
 	do{
-		var positionX=Math.round(Math.random()*500); //genera la distanza del nuovo ostacolo rispetto a quello vecchio
+		var positionX=Math.round(Math.random()*larghezzaCanvas); //genera la distanza del nuovo ostacolo rispetto a quello vecchio
 	}while(positionX<250);
 	positionX+=obstacles[obstacles.length-1].positionX;
 
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
-	var positionY=300-possibleHeight[type]-1; //laposizione y si calcola come quella del giocatore
+	var positionY=lunghezzaCanvas-possibleHeight[type]-1; //laposizione y si calcola come quella del giocatore
 	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type],"#00FF00", positionX, positionY); //istanzia un nuovo ostacolo
 
 	obstacles.push(obstacle);
@@ -144,7 +147,7 @@ function addObstacle(){
 	if(obstacles.length>6){ //se viene raggiunto il numero massimo di ostacoli
 		obstacles.splice(0,1); //elimina il primo ostacolo (obstacles è un array FILO)
 		obstacleCounter++;
-		$("#counter").text(obstacleCounter+"---"+velocityX);
+		$("#counter").text(obstacleCounter);
 	}
 }
 
