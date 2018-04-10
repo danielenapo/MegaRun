@@ -82,7 +82,7 @@ function controlli(){
 		if(player.onGround==true)
 			player.salta();
 	}
-	if(keyIsDown(RIGHT_ARROW)&& contaSpara>5){
+	if(keyIsDown(RIGHT_ARROW)&& contaSpara>7){
 		spara();
 		contaSpara=0;
 	}
@@ -181,7 +181,7 @@ function collisioni(){
 	//collisioni nemico-colpi
 	if(enemy.isAlive==true){
 		for(var i=0; i<colpi.length; i++){
-			if(enemy.isColliding(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height)){
+			if(enemy.isColliding(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height)==true){
 				enemy.health--;
 				colpi.splice(i,1);			
 			}
@@ -193,8 +193,10 @@ function collisioni(){
 	//collisioni ostacoli-colpi
 	if(colpi.length!=0){
 		for(var i=0; i<obstacles.length; i++){
-			for(var j=0; j<colpi; i++)
-				if(obstacles[i])
+			for(var j=0; j<colpi.length; j++){
+				if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width, colpi[j].height)==true)
+					colpi.splice(i,1);	
+			}		
 		}
 	}
 }
