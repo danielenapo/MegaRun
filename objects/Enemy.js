@@ -12,9 +12,18 @@ function Enemy(isAlive, height, width, color, positionX, positionY, health){
 	
 	this.die=function(){
 		this.isAlive=false;
+		positionX=600;
 	}
 
 	this.alive=function(){
 		this.isAlive=true;
+	}
+	
+	this.isColliding=function(killerPositionX, killerPositionY, killerWidth, killerHeight){
+		if(collideRectCircle(this.positionX,this.positionY,this.width,this.height,
+							killerPositionX,killerPositionY,killerWidth,killerHeight))
+			return true;
+		else 
+			return false;
 	}
 }

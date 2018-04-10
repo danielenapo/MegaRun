@@ -1,10 +1,52 @@
 body{
-	font-family:arial;}
+	font-family: Arial,Times New Roman, Times;
+	font-size: 14px;
+}
 	
 #finestra{
 	margin:auto;
 	display:block;
 }
+#perso{
+	margin: auto;
+	display: block;
+}
+#playAgain{
+	width: 250px;
+	height: 70px;
+	border: 1px solid black;
+	padding-left: 5px;
+	padding-bottom: 5px;
+	
+	position: absolute;
+	background-color: lightblue;
+	border-radius: 10px; /*bordi arrotondati*/
+	-moz-border-radius: 10px; /* firefox */
+	-webkit-border-radius: 10px; /* safari, chrome */
+}
+h2{
+	display: inline-block;
+	vertical-align: middle; /*allineamento verticale nel mezzo*/
+	padding-left: 3%;
+}
+#refresh{
+	vertical-align: middle;
+	
+}
+#sopra{
+	border-radius: 10px; /*bordi arrotondati*/
+	-moz-border-radius: 10px; /* firefox */
+	-webkit-border-radius: 10px; /* safari, chrome */
+	width: 200px;
+	height: 100px;
+	
+}
+
+#fine{
+	position:absolute;
+	display:block;
+}
+
 
 
 	

@@ -8,19 +8,20 @@ function setup(){
 	velocitaProiettili=30;
 	contaSpara=0;
 	fluttua=0;
-	enemy=new Enemy(false,40, 40, "#0000FF", 460, 200, 20 );
 	larghezzaCanvas=600;
 	lunghezzaCanvas=224;
+	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 5 );
+
 
 	//INIZIALIZZAZIONE CANVAS
-	bg=createImg("img/background.gif");
-	bg.position(0,0);
+	//bg=createImg("img/background.gif");
+	//bg.position(0,0);
 	createCanvas(larghezzaCanvas, lunghezzaCanvas);		//id="defaultCanvas0"
 	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
 	frameRate(30);
 
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
-	var velocityY=0, height=55, width=55, positionX=0;
+	var velocityY=0, height=55, width=55, positionX=30;
 	positionYMin=lunghezzaCanvas-height-1;			// = grandezza canvas-altezza-1(per non attaccarsi al fondo)
 	player= new Player(true,velocityY, height, width, "#FF0000", positionX, positionYMin, 100);
 
@@ -39,6 +40,7 @@ function setup(){
 
 function draw(){
 	background(52);
+	controlli();
 
 //######## AGGIORNAMENTO IMMAGINE CANVAS (draw) ##############
 
@@ -70,6 +72,11 @@ function draw(){
 
 function controlli(){
 	contaSpara++;
+	collisioni();
+	
+
+	
+
 	//CONTROLLO COMANDI PREMUTI
 	if(mouseIsPressed || keyIsDown(UP_ARROW) ||keyIsDown(32)){
 		if(player.onGround==true)
@@ -86,7 +93,7 @@ function controlli(){
 		difficultyLevel[0]=true;
 	}
 
-	if(difficultyLevel[1]==false && obstacleCounter==15){
+	if(difficultyLevel[1]==false && obstacleCounter==5){
 		enemy.alive();
 		difficultyLevel[1]=true;
 	}
@@ -126,6 +133,7 @@ function controlli(){
 		enemy.positionY=((Math.sin(fluttua))*20)+150;
 	//se il nemico è vivo viene spostato verso sinistra e fluttua
 	}
+	
 }
 
 function addObstacle(){
@@ -156,9 +164,37 @@ function spara(){
 	colpi.push(colpo);
 }
 
-function isColliding(obj1, obj2){
+function fine(){
+	noLoop();
+	$("#fine").html('<div id="sopra" ><div id="attuale"><img src="" ><div id="tot"> </div></div><div id="record"><img src="img/trophy.png"><div id="myRecord"> </div></div></div><div id="playAgain" onclick="replay()"><img id="refresh" src="img/refresh.png"><h2>Gioca ancora</h2></div><p id="counter">0</p>")');
+	$("#myRecord").text(obstacleCounter);
+}
 
-	if(disradius1+radius2)
-
-	return false;
+function collisioni(){
+	//CONTROLLI COLLISIONI
+	//collisioni personaggio-ostacoli
+	if(player.isColliding(obstacles[0].positionX, obstacles[0].positionY, obstacles[0].width, obstacles[0].height)==true)
+		fine()
+	//collisioni personaggio-nemico
+	if(player.isColliding(enemy.positionX, enemy.positionY, enemy.width, enemy.height)==true)
+		fine()
+	//collisioni nemico-colpi
+	if(enemy.isAlive==true){
+		for(var i=0; i<colpi.length; i++){
+			if(enemy.isColliding(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height)){
+				enemy.health--;
+				colpi.splice(i,1);			
+			}
+		}
+	}
+	if(enemy.health<=0)
+		enemy.die();
+	
+	//collisioni ostacoli-colpi
+	if(colpi.length!=0){
+		for(var i=0; i<obstacles.length; i++){
+			for(var j=0; j<colpi; i++)
+				if(obstacles[i])
+		}
+	}
 }

@@ -16,4 +16,15 @@ function Player(onGround, velocityY, height, width, color, positionX, positionY,
 		this.onGround=false;
 		this.positionY-=this.velocityY;
 	}
+	
+	this.isColliding=function(killerPositionX, killerPositionY, killerWidth, killerHeight){
+		if(collideRectRect(this.positionX,this.positionY,this.width,this.height,
+							killerPositionX,killerPositionY,killerWidth,killerHeight))
+			return true;
+		else 
+			return false;
+	}
+	
+	
+	
 }
