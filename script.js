@@ -8,21 +8,20 @@ function setup(){
 	velocitaProiettili=30;
 	contaSpara=0;
 	fluttua=0;
-	larghezzaCanvas=600;
-	lunghezzaCanvas=224;
-	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 5 );
+	larghezzaCanvas=480;
+	lunghezzaCanvas=263;
+	bg=loadImage("img/background.png");
+	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-80-(lunghezzaCanvas/3)), 5 );
 
 
 	//INIZIALIZZAZIONE CANVAS
-	//bg=createImg("img/background.gif");
-	//bg.position(0,0);
 	createCanvas(larghezzaCanvas, lunghezzaCanvas);		//id="defaultCanvas0"
 	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
 	frameRate(30);
 
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=55, width=55, positionX=30;
-	positionYMin=lunghezzaCanvas-height-1;			// = grandezza canvas-altezza-1(per non attaccarsi al fondo)
+	positionYMin=lunghezzaCanvas-height-80;			// = grandezza canvas-altezza-80(per non attaccarsi al fondo)
 	player= new Player(true,velocityY, height, width, "#FF0000", positionX, positionYMin, 100);
 
 	//INIZIALIZZAZIONE ARRAY DI OSTACOLI
@@ -31,7 +30,7 @@ function setup(){
 	var possibleHeight=[50, 30];//due possibili altezze(alto e basso)
 	var possibleWidth=[30, 50];//due possibili larghezze(stretto e alto)
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
-	var positionYO=lunghezzaCanvas-possibleHeight[type]-1; //laposizione y si calcola come quella del giocatore
+	var positionYO=lunghezzaCanvas-possibleHeight[type]-80; //laposizione y si calcola come quella del giocatore
 	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", 900, positionYO); //istanzia un nuovo ostacolo
 	obstacles.push(obstacle);
 	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", larghezzaCanvas+1000, positionYO); //istanzia un nuovo ostacolo
@@ -39,7 +38,7 @@ function setup(){
 }
 
 function draw(){
-	background(52);
+	background(bg);
 	controlli();
 
 //######## AGGIORNAMENTO IMMAGINE CANVAS (draw) ##############
@@ -147,7 +146,7 @@ function addObstacle(){
 	positionX+=obstacles[obstacles.length-1].positionX;
 
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
-	var positionY=lunghezzaCanvas-possibleHeight[type]-1; //laposizione y si calcola come quella del giocatore
+	var positionY=lunghezzaCanvas-possibleHeight[type]-80; //laposizione y si calcola come quella del giocatore
 	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type],"#00FF00", positionX, positionY); //istanzia un nuovo ostacolo
 
 	obstacles.push(obstacle);
@@ -160,7 +159,7 @@ function addObstacle(){
 }
 
 function spara(){
-	colpo= new Proiettile(10, 10, "#F0F0F0", player.positionX+(player.width/2), player.positionY+(player.height/2));
+	colpo= new Proiettile(10, 10, "#000000", player.positionX+(player.width/2), player.positionY+(player.height/2));
 	colpi.push(colpo);
 }
 
