@@ -3,6 +3,7 @@ function setup(){
 	//INIZIALIZZAZIONI VARIABILI
 	gravity=1;
 	velocityX=10;
+	rateoDiFuoco=7;
 	obstacleCounter=0;
 	difficultyLevel=[false,false, false];
 	velocitaProiettili=30;
@@ -17,7 +18,7 @@ function setup(){
 	//INIZIALIZZAZIONE CANVAS
 	createCanvas(larghezzaCanvas, lunghezzaCanvas);		//id="defaultCanvas0"
 	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
-	frameRate(60);
+	frameRate(30);
 
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=55, width=55, positionX=30;
@@ -31,9 +32,9 @@ function setup(){
 	var possibleWidth=[30, 50];//due possibili larghezze(stretto e alto)
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
 	var positionYO=lunghezzaCanvas-possibleHeight[type]-80; //la posizione y si calcola come quella del giocatore
-	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", 900, positionYO, 0); //istanzia un nuovo ostacolo
+	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FFF0", 900, positionYO, 0); //istanzia un nuovo ostacolo
 	obstacles.push(obstacle);
-	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", larghezzaCanvas+1000, positionYO, 0); //istanzia un nuovo ostacolo
+	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FFF0", larghezzaCanvas+1000, positionYO, 0); //istanzia un nuovo ostacolo
 	obstacles.push(obstacle);
 }
 
@@ -79,7 +80,7 @@ function controlli(){
 		if(player.onGround==true)
 			player.salta();
 	}
-	if(keyIsDown(RIGHT_ARROW)&& contaSpara>7){
+	if(keyIsDown(RIGHT_ARROW)&& contaSpara>rateoDiFuoco){
 		spara();
 		contaSpara=0;
 	}
@@ -142,15 +143,19 @@ function addObstacle(){
 		var positionX=Math.round(Math.random()*larghezzaCanvas); //genera la distanza del nuovo ostacolo rispetto a quello vecchio
 	}while(positionX<250);
 	positionX+=obstacles[obstacles.length-1].positionX;
+	
 	var isSpecial=Math.round(Math.random()*100);
-	if(isSpecial<=85) //15% probabilita di essere speciale
+	if(isSpecial<=85){ //15% probabilita di essere speciale
 		isSpecial=0; //non e' speciale
-	else
+		var color="#00FFF0";
+	}
+	else{
 		isSpecial=1;//è speciale
-
+		var color="#004440";
+	}
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
 	var positionY=lunghezzaCanvas-possibleHeight[type]-80; //laposizione y si calcola come quella del giocatore
-	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type],"#00FF00", positionX, positionY, isSpecial); //istanzia un nuovo ostacolo
+	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type],color, positionX, positionY, isSpecial); //istanzia un nuovo ostacolo
 
 	obstacles.push(obstacle);
 
@@ -199,11 +204,20 @@ function collisioni(){
 				if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width, colpi[j].height)==true){
 					colpi.splice(j,1);
 					if(obstacles[i].isSpecial==1){
-						obstacles.splice(i, 1);
-						
+						obstacles[i].becomePowerup();
+						break; //esce dal ciclo sennò si bugga tutto con il prossimo if
 					}
+					if(obstacles[i].isSpecial==2)
+						powerup();
+						obstacles.splice(i,1);//elimina il powerup
+					
 				}
 			}		
 		}
 	}
+	
+}
+
+function powerup(){
+	rateoDiFuoco=5;
 }
