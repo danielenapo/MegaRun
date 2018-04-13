@@ -11,7 +11,7 @@ function setup(){
 	larghezzaCanvas=480;
 	lunghezzaCanvas=263;
 	bg=loadImage("img/background.png");
-	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-80-(lunghezzaCanvas/3)), 5 );
+	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
 
 
 	//INIZIALIZZAZIONE CANVAS
@@ -30,10 +30,10 @@ function setup(){
 	var possibleHeight=[50, 30];//due possibili altezze(alto e basso)
 	var possibleWidth=[30, 50];//due possibili larghezze(stretto e alto)
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
-	var positionYO=lunghezzaCanvas-possibleHeight[type]-80; //laposizione y si calcola come quella del giocatore
-	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", 900, positionYO); //istanzia un nuovo ostacolo
+	var positionYO=lunghezzaCanvas-possibleHeight[type]-80; //la posizione y si calcola come quella del giocatore
+	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", 900, positionYO, 0); //istanzia un nuovo ostacolo
 	obstacles.push(obstacle);
-	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", larghezzaCanvas+1000, positionYO); //istanzia un nuovo ostacolo
+	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FF00", larghezzaCanvas+1000, positionYO, 0); //istanzia un nuovo ostacolo
 	obstacles.push(obstacle);
 }
 
@@ -72,9 +72,7 @@ function draw(){
 function controlli(){
 	contaSpara++;
 	collisioni();
-	
 
-	
 
 	//CONTROLLO COMANDI PREMUTI
 	if(mouseIsPressed || keyIsDown(UP_ARROW) ||keyIsDown(32)){
@@ -129,7 +127,7 @@ function controlli(){
 	if(enemy.isAlive==true){
 		fluttua+=0.1;
 		enemy.positionX-=3;
-		enemy.positionY=((Math.sin(fluttua))*20)+150;
+		enemy.positionY=((Math.sin(fluttua))*20)+100;
 	//se il nemico è vivo viene spostato verso sinistra e fluttua
 	}
 	
@@ -144,10 +142,15 @@ function addObstacle(){
 		var positionX=Math.round(Math.random()*larghezzaCanvas); //genera la distanza del nuovo ostacolo rispetto a quello vecchio
 	}while(positionX<250);
 	positionX+=obstacles[obstacles.length-1].positionX;
+	var isSpecial=Math.round(Math.random()*100);
+	if(isSpecial<=85) //15% probabilita di essere speciale
+		isSpecial=0; //non e' speciale
+	else
+		isSpecial=1;//è speciale
 
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
 	var positionY=lunghezzaCanvas-possibleHeight[type]-80; //laposizione y si calcola come quella del giocatore
-	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type],"#00FF00", positionX, positionY); //istanzia un nuovo ostacolo
+	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type],"#00FF00", positionX, positionY, isSpecial); //istanzia un nuovo ostacolo
 
 	obstacles.push(obstacle);
 
@@ -193,8 +196,13 @@ function collisioni(){
 	if(colpi.length!=0){
 		for(var i=0; i<obstacles.length; i++){
 			for(var j=0; j<colpi.length; j++){
-				if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width, colpi[j].height)==true)
-					colpi.splice(i,1);	
+				if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width, colpi[j].height)==true){
+					colpi.splice(j,1);
+					if(obstacles[i].isSpecial==1){
+						obstaclse.splice(i, 1);
+						
+					}
+				}
 			}		
 		}
 	}

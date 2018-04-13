@@ -26,4 +26,6 @@ function Enemy(isAlive, height, width, color, positionX, positionY, health){
 		else 
 			return false;
 	}
+	
+	
 }
