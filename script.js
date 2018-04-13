@@ -17,7 +17,7 @@ function setup(){
 	//INIZIALIZZAZIONE CANVAS
 	createCanvas(larghezzaCanvas, lunghezzaCanvas);		//id="defaultCanvas0"
 	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
-	frameRate(30);
+	frameRate(60);
 
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=55, width=55, positionX=30;
@@ -199,7 +199,7 @@ function collisioni(){
 				if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width, colpi[j].height)==true){
 					colpi.splice(j,1);
 					if(obstacles[i].isSpecial==1){
-						obstaclse.splice(i, 1);
+						obstacles.splice(i, 1);
 						
 					}
 				}
