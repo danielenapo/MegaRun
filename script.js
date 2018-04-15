@@ -3,22 +3,28 @@ function setup(){
 	//INIZIALIZZAZIONI VARIABILI
 	gravity=1;
 	velocityX=10;
-	rateoDiFuoco=7;
 	obstacleCounter=0;
-	difficultyLevel=[false,false, false];
-	velocitaProiettili=30;
+	difficultyLevel=0;
+	rateoDiFuoco=15;
+	velocitaProiettili=60;
 	contaSpara=0;
 	fluttua=0;
-	larghezzaCanvas=480;
+	larghezzaCanvas=480*2;
 	lunghezzaCanvas=263;
-	bg=loadImage("img/background.png");
 	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
 
+	//INIZIALIZZAZIONE BACKGROUND
+	backgrounds=[];
+	for(var i=0; i<4; i++){
+		var bg=new Background(263, 480, "img/background.png", i*480, 0);
+		bg.src=loadImage("img/background.png");
+		backgrounds.push(bg);
+	}
 
 	//INIZIALIZZAZIONE CANVAS
 	createCanvas(larghezzaCanvas, lunghezzaCanvas);		//id="defaultCanvas0"
 	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
-	frameRate(30);
+	frameRate(35);
 
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=55, width=55, positionX=30;
@@ -39,10 +45,17 @@ function setup(){
 }
 
 function draw(){
-	background(bg);
 	controlli();
 
 //######## AGGIORNAMENTO IMMAGINE CANVAS (draw) ##############
+
+	//STAMPA BACKGROUND
+	//background(0);
+	for(var i=0; i<backgrounds.length; i++){
+		backgrounds[i].positionX-=velocityX;
+		image(backgrounds[i].src, backgrounds[i].positionX, backgrounds[i].positionY);
+	}
+
 
 	//STAMPA GIOCATORE
 	noStroke();
@@ -60,7 +73,7 @@ function draw(){
 	for(var i=0; i<colpi.length; i++){
 		colpi[i].positionX+=velocitaProiettili;	//aggiorna la posizione dei proiettili
 		fill(color(colpi[i].color));
-		ellipse(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height);//disegna il personaggio
+		rect(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height);//disegna il personaggio
 	}
 
 	//STAMPA NEMICO
@@ -74,9 +87,8 @@ function controlli(){
 	contaSpara++;
 	collisioni();
 
-
 	//CONTROLLO COMANDI PREMUTI
-	if(mouseIsPressed || keyIsDown(UP_ARROW) ||keyIsDown(32)){
+	if(keyIsDown(UP_ARROW)){
 		if(player.onGround==true)
 			player.salta();
 	}
@@ -86,20 +98,25 @@ function controlli(){
 	}
 
 	//CONTROLLO DIFFICOLTA' DI GIOCO
-	if(difficultyLevel[0]==false && obstacleCounter==10){
+	if(difficultyLevel==0 && obstacleCounter==10){
 		velocityX+=0.5;
-		difficultyLevel[0]=true;
+		difficultyLevel++;
 	}
 
-	if(difficultyLevel[1]==false && obstacleCounter==5){
+	if(difficultyLevel==1 && obstacleCounter==15){
 		enemy.alive();
-		difficultyLevel[1]=true;
+		difficultyLevel++;
 	}
 
-	if(obstacleCounter==30 && difficultyLevel[2]==false){
+	if(obstacleCounter==30 && difficultyLevel==2){
 		velocityX+=0.5;
-		difficultyLevel[2]=true;
+		difficultyLevel++;
 	}
+
+	//AGGIUNTA BACKGROUND
+	if(backgrounds[0].positionX<=-backgrounds[0].width)
+		addBackground();
+
 
 	//AGGIUNTA OSTACOLI
 	if(obstacles[0].positionX<-100)
@@ -131,7 +148,16 @@ function controlli(){
 		enemy.positionY=((Math.sin(fluttua))*20)+100;
 	//se il nemico è vivo viene spostato verso sinistra e fluttua
 	}
-	
+
+}
+
+function addBackground(){
+		var bg=new Background(263, 480, "img/background.png", backgrounds[backgrounds.length-1].positionX+480, 0);
+		bg.src=loadImage("img/background.png");
+		backgrounds.push(bg);
+
+		if(backgrounds.length>=4)
+			backgrounds.splice(0,1);
 }
 
 function addObstacle(){
@@ -143,9 +169,9 @@ function addObstacle(){
 		var positionX=Math.round(Math.random()*larghezzaCanvas); //genera la distanza del nuovo ostacolo rispetto a quello vecchio
 	}while(positionX<250);
 	positionX+=obstacles[obstacles.length-1].positionX;
-	
+
 	var isSpecial=Math.round(Math.random()*100);
-	if(isSpecial<=85){ //15% probabilita di essere speciale
+	if(isSpecial<=95){ //5% probabilita di essere speciale
 		isSpecial=0; //non e' speciale
 		var color="#00FFF0";
 	}
@@ -179,9 +205,16 @@ function fine(){
 
 function collisioni(){
 	//CONTROLLI COLLISIONI
-	//collisioni personaggio-ostacoli
-	if(player.isColliding(obstacles[0].positionX, obstacles[0].positionY, obstacles[0].width, obstacles[0].height)==true)
-		fine()
+	//collisioni personaggio-ostacoli(e personaggio-powerups)
+	if(player.isColliding(obstacles[0].positionX, obstacles[0].positionY, obstacles[0].width, obstacles[0].height)==true){
+		if(obstacles[0].isSpecial==2){
+			powerup();
+			obstacles.splice(i,1);//elimina il powerup
+		}
+
+		else if(obstacles[0].isSpecial!=2)
+			fine();
+	}
 	//collisioni personaggio-nemico
 	if(player.isColliding(enemy.positionX, enemy.positionY, enemy.width, enemy.height)==true)
 		fine()
@@ -190,34 +223,36 @@ function collisioni(){
 		for(var i=0; i<colpi.length; i++){
 			if(enemy.isColliding(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height)==true){
 				enemy.health--;
-				colpi.splice(i,1);			
+				colpi.splice(i,1);
+				if(enemy.health<=0)
+						enemy.die();
 			}
 		}
 	}
-	if(enemy.health<=0)
-		enemy.die();
-	
+
 	//collisioni ostacoli-colpi
 	if(colpi.length!=0){
 		for(var i=0; i<obstacles.length; i++){
 			for(var j=0; j<colpi.length; j++){
 				if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width, colpi[j].height)==true){
 					colpi.splice(j,1);
-					if(obstacles[i].isSpecial==1){
+					if(obstacles[i].isSpecial==1)
 						obstacles[i].becomePowerup();
-						break; //esce dal ciclo sennò si bugga tutto con il prossimo if
-					}
-					if(obstacles[i].isSpecial==2)
-						powerup();
-						obstacles.splice(i,1);//elimina il powerup
-					
 				}
-			}		
+			}
 		}
 	}
-	
 }
 
+//assegnazione powerup random
 function powerup(){
-	rateoDiFuoco=5;
+	var randomPowerup=Math.round(Math.random()*2);
+	//MITRA
+	if(randomPowerup==0)
+		rateoDiFuoco--;
+	//RALLENTATORE
+	else{
+		velocityX-=0.5;
+		setInterval(function(){velocityX+=0.5;},5000);
+	}
 }

@@ -18,6 +18,7 @@ function Obstacle(height, width, color, positionX, positionY, isSpecial){
 	}
 	
 	this.becomePowerup=function(){
+		this.isSpecial=2;
 		this.width=10;
 		this.height=10;
 		this.special=2;
