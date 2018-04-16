@@ -7,7 +7,7 @@ function setup(){
 	difficultyLevel=0;
 	danno=1;
 	rateoDiFuoco=15;
-	velocitaProiettili=60;
+	velocitaProiettili=30;
 	contaSpara=0;
 	fluttua=0;
 	larghezzaCanvas=650;
@@ -46,12 +46,10 @@ function setup(){
 }
 
 function draw(){
-	controlli();
 
 //######## AGGIORNAMENTO IMMAGINE CANVAS (draw) ##############
 
 	//STAMPA BACKGROUND
-	//background(0);
 	for(var i=0; i<backgrounds.length; i++){
 		backgrounds[i].positionX-=velocityX;
 		image(backgrounds[i].src, backgrounds[i].positionX, backgrounds[i].positionY);
@@ -70,23 +68,38 @@ function draw(){
 		rect(obstacles[i].positionX, obstacles[i].positionY, obstacles[i].width, obstacles[i].height);//disegna il personaggio
 	}
 
-	//STAMPA PROIETTILI
-	for(var i=0; i<colpi.length; i++){
-		colpi[i].positionX+=velocitaProiettili;	//aggiorna la posizione dei proiettili
-		fill(color(colpi[i].color));
-		rect(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height);//disegna il personaggio
-	}
 
 	//STAMPA NEMICO
 	if(enemy.isAlive==true){
 		fill(color(enemy.color));
 		rect(enemy.positionX, enemy.positionY, enemy.width, enemy.height);
 	}
+
+
+	//STAMPA PROIETTILI
+	for(var i=0; i<colpi.length; i++){
+		colpi[i].positionX+=velocitaProiettili;	//aggiorna la posizione dei proiettili
+		fill(color(colpi[i].color));
+		ellipse(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height);//disegna il personaggio
+	}
+
+	//STAMPA UI
+	//punteggio
+	fill(0);
+	textSize(32);
+	text(obstacleCounter, 10, 240);
+	//arma
+	//inserire arma in uso
+	//velocita di gioco
+	//inserire velocita di gioco
+
+	//CONTROLLI
+	controlli();
+
 }
 
 function controlli(){
 	contaSpara++;
-	collisioni();
 
 	//CONTROLLO COMANDI PREMUTI
 	if(keyIsDown(UP_ARROW)){
@@ -94,7 +107,8 @@ function controlli(){
 			player.salta();
 	}
 	if(keyIsDown(RIGHT_ARROW)&& contaSpara>rateoDiFuoco){
-		spara();
+		var colpo= new Proiettile(10, 10, "#000000", player.positionX+(player.width/2), player.positionY+(player.height/2));
+		colpi.push(colpo);
 		contaSpara=0;
 	}
 
@@ -150,8 +164,53 @@ function controlli(){
 	//se il nemico è vivo viene spostato verso sinistra e fluttua
 	}
 
+	collisioni();
+
 }
 
+//CONTROLLO COLLISIONI
+function collisioni(){
+
+	//collisioni personaggio-ostacoli (e personaggio-powerups)
+	if(player.isColliding(obstacles[0].positionX, obstacles[0].positionY, obstacles[0].width, obstacles[0].height)==true){
+		if(obstacles[0].isSpecial==2){
+			powerup();
+			obstacles.splice(i,1);//elimina il powerup
+		}
+		else if(obstacles[0].isSpecial!=2)
+			fine();
+	}
+
+	//collisione ostacoli-colpi
+	for(var i=0; i<obstacles.length; i++){
+		for(var j=0; j<colpi.length; j++){
+			if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width, colpi[j].height)==true){
+				colpi.splice(j,1);
+				if(obstacles[i].isSpecial==1)
+					obstacles[i].becomePowerup();
+			}
+		}		
+	}
+
+	//collisioni nemico-colpi
+	if(enemy.isAlive==true){
+		for(var i=0; i<colpi.length; i++){
+			if(enemy.isColliding(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height)==true){
+				enemy.health-=danno;
+				colpi.splice(i,1);
+				if(enemy.health<=0)
+					enemy.die();
+			}
+		}
+	}
+
+
+	//collisioni personaggio-nemico
+	if(player.isColliding(enemy.positionX, enemy.positionY, enemy.width, enemy.height)==true)
+		fine();
+}
+
+//FUNZIONI CHE AGGIUNGONO DINAMICAMENTE OSTACOLI E IMMAGINE DI SFONDO
 function addBackground(){
 		var bg=new Background(263, 480, "img/background.png", backgrounds[backgrounds.length-1].positionX+480, 0);
 		bg.src=loadImage("img/background.png");
@@ -189,86 +248,44 @@ function addObstacle(){
 	if(obstacles.length>6){ //se viene raggiunto il numero massimo di ostacoli
 		obstacles.splice(0,1); //elimina il primo ostacolo (obstacles è un array FILO)
 		obstacleCounter++;
-		$("#counter").text(obstacleCounter);
 	}
 }
 
-function spara(){
-	colpo= new Proiettile(10, 10, "#000000", player.positionX+(player.width/2), player.positionY+(player.height/2));
-	colpi.push(colpo);
-}
-
-function fine(){
-	noLoop();
-	$("#fine").html('<div id="sopra" ><div id="attuale"><img src="" ><div id="tot"> </div></div><div id="record"><img src="img/trophy.png"><div id="myRecord"> </div></div></div><div id="playAgain" onclick="replay()"><img id="refresh" src="img/refresh.png"><h2>Gioca ancora</h2></div><p id="counter">0</p>")');
-	$("#myRecord").text(obstacleCounter);
-}
-
-function collisioni(){
-	//CONTROLLI COLLISIONI
-	//collisioni personaggio-ostacoli(e personaggio-powerups)
-	if(player.isColliding(obstacles[0].positionX, obstacles[0].positionY, obstacles[0].width, obstacles[0].height)==true){
-		if(obstacles[0].isSpecial==2){
-			powerup();
-			obstacles.splice(i,1);//elimina il powerup
-		}
-
-		else if(obstacles[0].isSpecial!=2)
-			fine();
-	}
-	//collisioni personaggio-nemico
-	if(player.isColliding(enemy.positionX, enemy.positionY, enemy.width, enemy.height)==true)
-		fine()
-	//collisioni nemico-colpi
-	if(enemy.isAlive==true){
-		for(var i=0; i<colpi.length; i++){
-			if(enemy.isColliding(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height)==true){
-				enemy.health-=danno;
-				colpi.splice(i,1);
-				if(enemy.health<=0)
-						enemy.die();
-			}
-		}
-	}
-
-	//collisioni ostacoli-colpi
-	if(colpi.length!=0){
-		for(var i=0; i<obstacles.length; i++){
-			for(var j=0; j<colpi.length; j++){
-				if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width, colpi[j].height)==true){
-					colpi.splice(j,1);
-					if(obstacles[i].isSpecial==1)
-						obstacles[i].becomePowerup();
-				}
-			}
-		}
-	}
-}
-
-//assegnazione powerup random
+//ASSEGNAZIONE DI UN POWERUP RANDOM
 function powerup(){
-	var randomPowerup=Math.round(Math.random()*4);
+	var randomPowerup=Math.round(Math.random()*3);
 	//MITRA
 	if(randomPowerup==0){
-		velocitaProiettili=75;
+		alert("mitra");
+		velocitaProiettili=45;
 		rateoDiFuoco=5;
 		danno=0.5;
 	}
 	//CANNONE 
 	else if(randomPowerup==1){
-		velocitaProiettili=50;
+		alert("cannone");
+		velocitaProiettili=25;
 		rateoDiFuoco=20;
 		danno=2;
 	}
 	//PISTOLA
 	else if(randomPowerup==2){
-		velocitaProiettili=60;
+		alert("pistola");
+		velocitaProiettili=30;
 		rateoDiFuoco=15;
 		danno=1;
 	}
 	//RALLENTATORE
 	else if(randomPowerup==3){
+		alert("rallentatore");
 		velocityX--;
 		setInterval(function(){velocityX++;},10000);
 	}
+}
+
+//FINE GIOCO
+function fine(){
+	noLoop();
+//	$("#fine").html('<div id="sopra" ><div id="attuale"><img src="" ><div id="tot"> </div></div><div id="record"><img src="img/trophy.png"><div id="myRecord"> </div></div></div><div id="playAgain" onclick="replay()"><img id="refresh" src="img/refresh.png"><h2>Gioca ancora</h2></div><p id="counter">0</p>")');
+//	$("#myRecord").text(obstacleCounter);
 }

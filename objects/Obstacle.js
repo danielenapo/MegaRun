@@ -10,8 +10,7 @@ function Obstacle(height, width, color, positionX, positionY, isSpecial){
 	this.isSpecial=isSpecial; //valore 0 se è normale, 1 se è speciale, 2 se è speciale ed è stato colpito
 	
 	this.isColliding=function(killerPositionX, killerPositionY, killerWidth, killerHeight){
-		if(collideRectCircle(this.positionX,this.positionY,this.width,this.height,
-							killerPositionX,killerPositionY,killerWidth,killerHeight))
+		if(collideRectCircle(this.positionX,this.positionY,this.width,this.height,killerPositionX,killerPositionY,killerWidth,killerHeight))
 			return true;
 		else 
 			return false;

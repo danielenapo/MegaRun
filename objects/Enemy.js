@@ -20,8 +20,7 @@ function Enemy(isAlive, height, width, color, positionX, positionY, health){
 	}
 	
 	this.isColliding=function(killerPositionX, killerPositionY, killerWidth, killerHeight){
-		if(collideRectCircle(this.positionX,this.positionY,this.width,this.height,
-							killerPositionX,killerPositionY,killerWidth,killerHeight))
+		if(collideRectCircle(this.positionX,this.positionY,this.width,this.height,killerPositionX,killerPositionY,killerWidth,killerHeight))
 			return true;
 		else 
 			return false;
