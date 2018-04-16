@@ -5,11 +5,12 @@ function setup(){
 	velocityX=10;
 	obstacleCounter=0;
 	difficultyLevel=0;
+	danno=1;
 	rateoDiFuoco=15;
 	velocitaProiettili=60;
 	contaSpara=0;
 	fluttua=0;
-	larghezzaCanvas=480*2;
+	larghezzaCanvas=650;
 	lunghezzaCanvas=263;
 	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
 
@@ -222,7 +223,7 @@ function collisioni(){
 	if(enemy.isAlive==true){
 		for(var i=0; i<colpi.length; i++){
 			if(enemy.isColliding(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height)==true){
-				enemy.health--;
+				enemy.health-=danno;
 				colpi.splice(i,1);
 				if(enemy.health<=0)
 						enemy.die();
@@ -246,13 +247,28 @@ function collisioni(){
 
 //assegnazione powerup random
 function powerup(){
-	var randomPowerup=Math.round(Math.random()*2);
+	var randomPowerup=Math.round(Math.random()*4);
 	//MITRA
-	if(randomPowerup==0)
-		rateoDiFuoco--;
+	if(randomPowerup==0){
+		velocitaProiettili=75;
+		rateoDiFuoco=5;
+		danno=0.5;
+	}
+	//CANNONE 
+	else if(randomPowerup==1){
+		velocitaProiettili=50;
+		rateoDiFuoco=20;
+		danno=2;
+	}
+	//PISTOLA
+	else if(randomPowerup==2){
+		velocitaProiettili=60;
+		rateoDiFuoco=15;
+		danno=1;
+	}
 	//RALLENTATORE
-	else{
-		velocityX-=0.5;
-		setInterval(function(){velocityX+=0.5;},5000);
+	else if(randomPowerup==3){
+		velocityX--;
+		setInterval(function(){velocityX++;},10000);
 	}
 }
