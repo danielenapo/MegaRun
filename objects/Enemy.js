@@ -11,8 +11,10 @@ function Enemy(isAlive, height, width, color, positionX, positionY, health){
 	this.positionY=positionY;
 	
 	this.die=function(){
+		//resetta i valori delle proprietà
+		this.positionX=700;
+		this.health=2;
 		this.isAlive=false;
-		positionX=600;
 	}
 
 	this.alive=function(){

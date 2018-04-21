@@ -1,8 +1,9 @@
 //OGGETTO DEL PERSONAGGIO
-function Player(onGround, velocityY, height, width, color, positionX, positionY, health){
+function Player(onGround, velocityY, sprites, height, width, color, positionX, positionY, health){
 	this.onGround=onGround; //bool che controlla se sta saltando
 	this.velocityY=velocityY;//velocità in salto, serve per saltare
 	//dati forma fisica
+	this.sprites=sprites;
 	this.height=height;
 	this.width=width;
 	this.color=color;

@@ -1,6 +1,8 @@
 //##################INIZIALIZZAZIONI#####################
 function setup(){
 	//INIZIALIZZAZIONI VARIABILI
+	currentPowerup="pistola";
+	dimensioneProiettile=10;
 	gravity=1;
 	velocityX=10;
 	obstacleCounter=0;
@@ -30,7 +32,8 @@ function setup(){
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=55, width=55, positionX=30;
 	positionYMin=lunghezzaCanvas-height-80;			// = grandezza canvas-altezza-80(per non attaccarsi al fondo)
-	player= new Player(true,velocityY, height, width, "#FF0000", positionX, positionYMin, 100);
+	player= new Player(true,velocityY, "img/player.png", height, width, "#FF0000", positionX, positionYMin, 100);
+	player.sprites=loadImage("img/player.png");
 
 	//INIZIALIZZAZIONE ARRAY DI OSTACOLI
 	obstacles=[];
@@ -58,9 +61,9 @@ function draw(){
 
 	//STAMPA GIOCATORE
 	noStroke();
-	fill(color(player.color));	// riempie il quadrato del colore selezionato
-	rect(player.positionX, player.positionY, player.width, player.height);	//disegna il personaggio
-
+	//fill(color(player.color));	// riempie il quadrato del colore selezionato
+	//rect(player.positionX, player.positionY, player.width, player.height);	//disegna il personaggio
+	image(player.sprites,player.positionX,player.positionY,player.width,player.height,0,0,100, 100 );
 	//STAMPA OSTACOLI
 	for(var i=0; i<obstacles.length; i++){
 		obstacles[i].positionX-=velocityX;	//aggiorna la posizione degli ostacoli
@@ -84,14 +87,10 @@ function draw(){
 	}
 
 	//STAMPA UI
-	//punteggio
 	fill(0);
 	textSize(32);
-	text(obstacleCounter, 10, 240);
-	//arma
-	//inserire arma in uso
-	//velocita di gioco
-	//inserire velocita di gioco
+	text(obstacleCounter, 10, 250);
+	text(currentPowerup, 500, 250);
 
 	//CONTROLLI
 	controlli();
@@ -101,30 +100,29 @@ function draw(){
 function controlli(){
 	contaSpara++;
 
+
+	
 	//CONTROLLO COMANDI PREMUTI
 	if(keyIsDown(UP_ARROW)){
 		if(player.onGround==true)
 			player.salta();
 	}
 	if(keyIsDown(RIGHT_ARROW)&& contaSpara>rateoDiFuoco){
-		var colpo= new Proiettile(10, 10, "#000000", player.positionX+(player.width/2), player.positionY+(player.height/2));
+		var colpo= new Proiettile(dimensioneProiettile, dimensioneProiettile, "#000000", player.positionX+(player.width/2), player.positionY+(player.height/2));
 		colpi.push(colpo);
 		contaSpara=0;
 	}
 
 	//CONTROLLO DIFFICOLTA' DI GIOCO
-	if(difficultyLevel==0 && obstacleCounter==10){
+	//la velocita aumenta di 0.5 ogni 10 ostacoli saltati
+	if(difficultyLevel%2==0 && (obstacleCounter+1)%10==0){
 		velocityX+=0.5;
 		difficultyLevel++;
 	}
 
-	if(difficultyLevel==1 && obstacleCounter==15){
+	//spawna un nemico 5 salti di ostacoli dopo velocità aumentata 
+	if(difficultyLevel%2!=0 && (obstacleCounter+1)%7==0 && (obstacleCounter+1)%10!=0){
 		enemy.alive();
-		difficultyLevel++;
-	}
-
-	if(obstacleCounter==30 && difficultyLevel==2){
-		velocityX+=0.5;
 		difficultyLevel++;
 	}
 
@@ -231,7 +229,7 @@ function addObstacle(){
 	positionX+=obstacles[obstacles.length-1].positionX;
 
 	var isSpecial=Math.round(Math.random()*100);
-	if(isSpecial<=95){ //5% probabilita di essere speciale
+	if(isSpecial<=90){ //10% probabilita di essere speciale
 		isSpecial=0; //non e' speciale
 		var color="#00FFF0";
 	}
@@ -255,37 +253,41 @@ function addObstacle(){
 function powerup(){
 	var randomPowerup=Math.round(Math.random()*3);
 	//MITRA
-	if(randomPowerup==0){
-		alert("mitra");
-		velocitaProiettili=45;
-		rateoDiFuoco=5;
+	if(randomPowerup==0 && currentPowerup!="mitra"){
+		currentPowerup="mitra";
+		velocitaProiettili=50;
+		rateoDiFuoco=4;
 		danno=0.5;
+		dimensioneProiettile=7;
 	}
 	//CANNONE 
-	else if(randomPowerup==1){
-		alert("cannone");
+	else if(randomPowerup==1 && currentPowerup!="cannone"){
+		currentPowerup="cannone";
 		velocitaProiettili=25;
-		rateoDiFuoco=20;
+		rateoDiFuoco=30;
 		danno=2;
+		dimensioneProiettile=25;
+
 	}
 	//PISTOLA
-	else if(randomPowerup==2){
-		alert("pistola");
+	else if(randomPowerup==2 && currentPowerup!="pistola"){
+		currentPowerup="pistola";
 		velocitaProiettili=30;
 		rateoDiFuoco=15;
 		danno=1;
+		dimensioneProiettile=10;
+
 	}
 	//RALLENTATORE
-	else if(randomPowerup==3){
-		alert("rallentatore");
+	else{
+		alert("rallenta velocita");
 		velocityX--;
-		setInterval(function(){velocityX++;},10000);
 	}
 }
 
 //FINE GIOCO
 function fine(){
 	noLoop();
-//	$("#fine").html('<div id="sopra" ><div id="attuale"><img src="" ><div id="tot"> </div></div><div id="record"><img src="img/trophy.png"><div id="myRecord"> </div></div></div><div id="playAgain" onclick="replay()"><img id="refresh" src="img/refresh.png"><h2>Gioca ancora</h2></div><p id="counter">0</p>")');
-//	$("#myRecord").text(obstacleCounter);
+	$("#fine").html('<div id="sopra" ><div id="attuale"><img src="" ><div id="tot"> </div></div><div id="record"><img src="img/trophy.png"><div id="myRecord"> </div></div></div><div id="playAgain" onclick="replay()"><img id="refresh" src="img/refresh.png"><h2>Gioca ancora</h2></div><p id="counter">0</p>")');
+	$("#myRecord").text(obstacleCounter);
 }
