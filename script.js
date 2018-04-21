@@ -15,6 +15,8 @@ function setup(){
 	larghezzaCanvas=650;
 	lunghezzaCanvas=263;
 	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
+	spriteRun=30;
+	oldSpriteRun=20;
 
 	//INIZIALIZZAZIONE BACKGROUND
 	backgrounds=[];
@@ -27,7 +29,7 @@ function setup(){
 	//INIZIALIZZAZIONE CANVAS
 	createCanvas(larghezzaCanvas, lunghezzaCanvas);		//id="defaultCanvas0"
 	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
-	frameRate(35);
+	frameRate(30);
 
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=55, width=55, positionX=30;
@@ -48,9 +50,8 @@ function setup(){
 	obstacles.push(obstacle);
 }
 
-function draw(){
-
 //######## AGGIORNAMENTO IMMAGINE CANVAS (draw) ##############
+function draw(){
 
 	//STAMPA BACKGROUND
 	for(var i=0; i<backgrounds.length; i++){
@@ -58,12 +59,21 @@ function draw(){
 		image(backgrounds[i].src, backgrounds[i].positionX, backgrounds[i].positionY);
 	}
 
-
-	//STAMPA GIOCATORE
 	noStroke();
-	//fill(color(player.color));	// riempie il quadrato del colore selezionato
-	//rect(player.positionX, player.positionY, player.width, player.height);	//disegna il personaggio
-	image(player.sprites,player.positionX,player.positionY,player.width,player.height,0,0,100, 100 );
+
+	//STAMPA GIOCATORE	
+	
+	if(player.onGround==true){
+		image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun+spriteRun,65,player.width/2,player.height/2 );
+		oldSpriteRun=oldSpriteRun+spriteRun;
+		if(oldSpriteRun>=140)
+			oldSpriteRun=0;
+	}
+	else
+		image(player.sprites,player.positionX,player.positionY,player.width,player.height,165,65,player.width/2,player.height/2 );
+	
+	
+	
 	//STAMPA OSTACOLI
 	for(var i=0; i<obstacles.length; i++){
 		obstacles[i].positionX-=velocityX;	//aggiorna la posizione degli ostacoli
@@ -97,6 +107,8 @@ function draw(){
 
 }
 
+//######## CONTROLLI EFFETTUATI AD OGNI FRAME ##############
+
 function controlli(){
 	contaSpara++;
 
@@ -129,7 +141,6 @@ function controlli(){
 	//AGGIUNTA BACKGROUND
 	if(backgrounds[0].positionX<=-backgrounds[0].width)
 		addBackground();
-
 
 	//AGGIUNTA OSTACOLI
 	if(obstacles[0].positionX<-100)
@@ -279,7 +290,7 @@ function powerup(){
 
 	}
 	//RALLENTATORE
-	else{
+	else if(randomPowerup==3 && velocityX>9){
 		alert("rallenta velocita");
 		velocityX--;
 	}
