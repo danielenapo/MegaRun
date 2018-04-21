@@ -17,6 +17,7 @@ function setup(){
 	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
 	spriteRun=30;
 	oldSpriteRun=20;
+	isGeneratoPowerup=false;
 
 	//INIZIALIZZAZIONE BACKGROUND
 	backgrounds=[];
@@ -61,8 +62,8 @@ function draw(){
 
 	noStroke();
 
-	//STAMPA GIOCATORE	
-	
+	//STAMPA GIOCATORE
+
 	if(player.onGround==true){
 		image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun+spriteRun,65,player.width/2,player.height/2 );
 		oldSpriteRun=oldSpriteRun+spriteRun;
@@ -71,9 +72,9 @@ function draw(){
 	}
 	else
 		image(player.sprites,player.positionX,player.positionY,player.width,player.height,165,65,player.width/2,player.height/2 );
-	
-	
-	
+
+
+
 	//STAMPA OSTACOLI
 	for(var i=0; i<obstacles.length; i++){
 		obstacles[i].positionX-=velocityX;	//aggiorna la posizione degli ostacoli
@@ -113,7 +114,7 @@ function controlli(){
 	contaSpara++;
 
 
-	
+
 	//CONTROLLO COMANDI PREMUTI
 	if(keyIsDown(UP_ARROW)){
 		if(player.onGround==true)
@@ -132,7 +133,7 @@ function controlli(){
 		difficultyLevel++;
 	}
 
-	//spawna un nemico 5 salti di ostacoli dopo velocità aumentata 
+	//spawna un nemico 5 salti di ostacoli dopo velocità aumentata
 	if(difficultyLevel%2!=0 && (obstacleCounter+1)%7==0 && (obstacleCounter+1)%10!=0){
 		enemy.alive();
 		difficultyLevel++;
@@ -198,7 +199,7 @@ function collisioni(){
 				if(obstacles[i].isSpecial==1)
 					obstacles[i].becomePowerup();
 			}
-		}		
+		}
 	}
 
 	//collisioni nemico-colpi
@@ -262,38 +263,47 @@ function addObstacle(){
 
 //ASSEGNAZIONE DI UN POWERUP RANDOM
 function powerup(){
-	var randomPowerup=Math.round(Math.random()*3);
-	//MITRA
-	if(randomPowerup==0 && currentPowerup!="mitra"){
-		currentPowerup="mitra";
-		velocitaProiettili=50;
-		rateoDiFuoco=4;
-		danno=0.5;
-		dimensioneProiettile=7;
-	}
-	//CANNONE 
-	else if(randomPowerup==1 && currentPowerup!="cannone"){
-		currentPowerup="cannone";
-		velocitaProiettili=25;
-		rateoDiFuoco=30;
-		danno=2;
-		dimensioneProiettile=25;
 
-	}
-	//PISTOLA
-	else if(randomPowerup==2 && currentPowerup!="pistola"){
-		currentPowerup="pistola";
-		velocitaProiettili=30;
-		rateoDiFuoco=15;
-		danno=1;
-		dimensioneProiettile=10;
+	do{
+		var randomPowerup=Math.round(Math.random()*3);
+		//MITRA
+		if(randomPowerup==0 && currentPowerup!="mitra"){
+			currentPowerup="mitra";
+			velocitaProiettili=50;
+			rateoDiFuoco=4;
+			danno=0.5;
+			dimensioneProiettile=7;
+			isGeneratoPowerup=true;
+		}
+		//CANNONE
+		else if(randomPowerup==1 && currentPowerup!="cannone"){
+			currentPowerup="cannone";
+			velocitaProiettili=25;
+			rateoDiFuoco=30;
+			danno=2;
+			dimensioneProiettile=25;
+			isGeneratoPowerup=true;
 
-	}
-	//RALLENTATORE
-	else if(randomPowerup==3 && velocityX>9){
-		alert("rallenta velocita");
-		velocityX--;
-	}
+		}
+		//PISTOLA
+		else if(randomPowerup==2 && currentPowerup!="pistola"){
+			currentPowerup="pistola";
+			velocitaProiettili=30;
+			rateoDiFuoco=15;
+			danno=1;
+			dimensioneProiettile=10;
+			isGeneratoPowerup=true;
+
+		}
+		//RALLENTATORE
+		else if(randomPowerup==3 && velocityX>9){
+			alert("rallenta velocita");
+			velocityX--;
+			isGeneratoPowerup=true;
+		}
+	}while(isGeneratoPowerup==false);
+
+	isGeneratoPowerup=false;
 }
 
 //FINE GIOCO
