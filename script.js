@@ -20,7 +20,7 @@ function setup(){
 	oldSpriteRun=0;
 	isGeneratoPowerup=false;
 	contaSprite=0;
-	velocitaSprite=4;
+	velocitaSprite=3;
 	oldSpriteShoot=0;
 
 	//INIZIALIZZAZIONE BACKGROUND
@@ -70,8 +70,7 @@ function draw(){
 	//Se sta correndo
 	if(player.onGround==true){
 		//controlli per non fa andare le sprite troppo veloce e per selezionarle
-		if (contaSprite>=velocitaSprite){
-			contaSprite=0;
+		if (contaSprite==0){
 			oldSpriteRun=oldSpriteRun+spriteRun;
 			if(oldSpriteRun>=90 || oldSpriteRun<=30)
 				spriteRun=-1*spriteRun;
@@ -127,10 +126,13 @@ function draw(){
 //######## CONTROLLI EFFETTUATI AD OGNI FRAME ##############
 
 function controlli(){
+	
+	//CONTROLLO CONTATORI FRAME
 	contaSpara++;
-	contaSprite++;
-
-
+	if(contaSprite>=velocitaSprite)
+		contaSprite=0;
+	else
+		contaSprite++;
 
 	//CONTROLLO COMANDI PREMUTI
 	if(keyIsDown(UP_ARROW)){
