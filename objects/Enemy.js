@@ -1,7 +1,8 @@
 //OGGETTO DEL NEMICO
-function Enemy(isAlive, height, width, color, positionX, positionY, health){
+function Enemy(isAlive, sprites, height, width, color, positionX, positionY, health){
 	//dati forma fisica
 	this.isAlive;
+	this.sprites=sprites;
 	this.height=height;
 	this.width=width;
 	this.color=color;

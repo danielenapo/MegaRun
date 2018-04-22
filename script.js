@@ -14,7 +14,8 @@ function setup(){
 	fluttua=0;
 	larghezzaCanvas=650;
 	lunghezzaCanvas=263;
-	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
+	enemy=new Enemy(false,"img/player.png",40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
+	enemy.sprites=loadImage("img/player.png");
 	spriteRun=30;
 	oldSpriteRun=0;
 	isGeneratoPowerup=false;
