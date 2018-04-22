@@ -16,8 +16,11 @@ function setup(){
 	lunghezzaCanvas=263;
 	enemy=new Enemy(false,40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
 	spriteRun=30;
-	oldSpriteRun=20;
+	oldSpriteRun=0;
 	isGeneratoPowerup=false;
+	contaSprite=0;
+	velocitaSprite=4;
+	oldSpriteShoot=0;
 
 	//INIZIALIZZAZIONE BACKGROUND
 	backgrounds=[];
@@ -63,18 +66,37 @@ function draw(){
 	noStroke();
 
 	//STAMPA GIOCATORE
-
+	//Se sta correndo
 	if(player.onGround==true){
-		image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun+spriteRun,65,player.width/2,player.height/2 );
-		oldSpriteRun=oldSpriteRun+spriteRun;
-		if(oldSpriteRun>=140)
-			oldSpriteRun=0;
+		//controlli per non fa andare le sprite troppo veloce e per selezionarle
+		if (contaSprite>=velocitaSprite){
+			contaSprite=0;
+			oldSpriteRun=oldSpriteRun+spriteRun;
+			if(oldSpriteRun>=90 || oldSpriteRun<=30)
+				spriteRun=-1*spriteRun;
+		}
+		if(keyIsDown(RIGHT_ARROW)){ //se sta correndo e sparando
+			if(oldSpriteShoot<=40)
+				oldSpriteShoot=40;
+		}
+		else if(!keyIsDown(RIGHT_ARROW))
+		 	oldSpriteShoot=0;
+		image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun,0+oldSpriteShoot,player.width/2,player.height/2 );
+
 	}
+	//se sta saltando
 	else
-		image(player.sprites,player.positionX,player.positionY,player.width,player.height,165,65,player.width/2,player.height/2 );
+		image(player.sprites,player.positionX,player.positionY-10,player.width,player.height+10,110,0,player.width/2,(player.height/2)+10 );
 
 
-
+	//STAMPA PROIETTILI
+	for(var i=0; i<colpi.length; i++){
+		colpi[i].positionX+=velocitaProiettili;	//aggiorna la posizione dei proiettili
+		fill(color(colpi[i].color));
+		ellipse(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height);//disegna il personaggio
+	}
+	
+	
 	//STAMPA OSTACOLI
 	for(var i=0; i<obstacles.length; i++){
 		obstacles[i].positionX-=velocityX;	//aggiorna la posizione degli ostacoli
@@ -89,13 +111,6 @@ function draw(){
 		rect(enemy.positionX, enemy.positionY, enemy.width, enemy.height);
 	}
 
-
-	//STAMPA PROIETTILI
-	for(var i=0; i<colpi.length; i++){
-		colpi[i].positionX+=velocitaProiettili;	//aggiorna la posizione dei proiettili
-		fill(color(colpi[i].color));
-		ellipse(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height);//disegna il personaggio
-	}
 
 	//STAMPA UI
 	fill(0);
@@ -112,6 +127,7 @@ function draw(){
 
 function controlli(){
 	contaSpara++;
+	contaSprite++;
 
 
 
