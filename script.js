@@ -1,27 +1,41 @@
 //##################INIZIALIZZAZIONI#####################
 function setup(){
-	//INIZIALIZZAZIONI VARIABILI
-	currentPowerup="pistola";
-	dimensioneProiettile=10;
+	
+	//INIZIALIZZAZIONE CANVAS E FISICA
+	larghezzaCanvas=650;
+	lunghezzaCanvas=263;
+	createCanvas(larghezzaCanvas, lunghezzaCanvas);		//id="defaultCanvas0"
+	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
+	frameRate(30);
 	gravity=1;
 	velocityX=10;
-	obstacleCounter=0;
 	difficultyLevel=0;
+	contaSprite=0;
+	velocitaSprite=3;
+
+	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
+	var velocityY=0, height=55, width=55, positionX=30;
+	positionYMin=lunghezzaCanvas-height-80;			// = grandezza canvas-altezza-80(per non attaccarsi al fondo)
+	player= new Player(true,velocityY, "img/player.png", height, width, "#FF0000", positionX, positionYMin, 100);
+	player.sprites=loadImage("img/player.png");
+	spriteRun=30;
+	oldSpriteRun=0;
+	oldSpriteShoot=0;
+
+	//INIZIALIZZAZIONE NEMICO
+	enemy=new Enemy(false,"img/player.png",30, 64, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
+	enemy.sprites=loadImage("img/player.png");
+	fluttua=0;
+	oldSpriteEnemy=0;
+
+	//INIZIALIZZAZIONE PROIETTILI e POWERUP
+	currentPowerup="pistola";
+	dimensioneProiettile=10;
 	danno=1;
 	rateoDiFuoco=15;
 	velocitaProiettili=30;
 	contaSpara=0;
-	fluttua=0;
-	larghezzaCanvas=650;
-	lunghezzaCanvas=263;
-	enemy=new Enemy(false,"img/player.png",40, 40, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
-	enemy.sprites=loadImage("img/player.png");
-	spriteRun=30;
-	oldSpriteRun=0;
 	isGeneratoPowerup=false;
-	contaSprite=0;
-	velocitaSprite=3;
-	oldSpriteShoot=0;
 
 	//INIZIALIZZAZIONE BACKGROUND
 	backgrounds=[];
@@ -31,18 +45,8 @@ function setup(){
 		backgrounds.push(bg);
 	}
 
-	//INIZIALIZZAZIONE CANVAS
-	createCanvas(larghezzaCanvas, lunghezzaCanvas);		//id="defaultCanvas0"
-	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
-	frameRate(30);
-
-	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
-	var velocityY=0, height=55, width=55, positionX=30;
-	positionYMin=lunghezzaCanvas-height-80;			// = grandezza canvas-altezza-80(per non attaccarsi al fondo)
-	player= new Player(true,velocityY, "img/player.png", height, width, "#FF0000", positionX, positionYMin, 100);
-	player.sprites=loadImage("img/player.png");
-
 	//INIZIALIZZAZIONE ARRAY DI OSTACOLI
+	obstacleCounter=0;
 	obstacles=[];
 	colpi=[];
 	var possibleHeight=[50, 30];//due possibili altezze(alto e basso)
@@ -53,6 +57,9 @@ function setup(){
 	obstacles.push(obstacle);
 	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FFF0", larghezzaCanvas+1000, positionYO, 0); //istanzia un nuovo ostacolo
 	obstacles.push(obstacle);
+
+	$("#fine").hide();
+	loop();
 }
 
 //######## AGGIORNAMENTO IMMAGINE CANVAS (draw) ##############
@@ -86,8 +93,7 @@ function draw(){
 	}
 	//se sta saltando
 	else
-		image(player.sprites,player.positionX,player.positionY-10,player.width,player.height+10,110,0,player.width/2,(player.height/2)+10 );
-
+		image(player.sprites,player.positionX,player.positionY-10,player.width,player.height+10,110,0,player.width/2,(player.height/2)+7 );
 
 	//STAMPA PROIETTILI
 	for(var i=0; i<colpi.length; i++){
@@ -95,20 +101,23 @@ function draw(){
 		fill(color(colpi[i].color));
 		ellipse(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height);//disegna il personaggio
 	}
-	
-	
+
+
+	//STAMPA NEMICO
+	if(enemy.isAlive==true){
+		if(contaSprite==0)
+			oldSpriteEnemy=32;
+		else
+			oldSpriteEnemy=0;
+		image(enemy.sprites,enemy.positionX,enemy.positionY,enemy.width,enemy.height,oldSpriteEnemy,80,enemy.width/2,enemy.height/2 );
+
+	}
+
 	//STAMPA OSTACOLI
 	for(var i=0; i<obstacles.length; i++){
 		obstacles[i].positionX-=velocityX;	//aggiorna la posizione degli ostacoli
 		fill(color(obstacles[i].color));
 		rect(obstacles[i].positionX, obstacles[i].positionY, obstacles[i].width, obstacles[i].height);//disegna il personaggio
-	}
-
-
-	//STAMPA NEMICO
-	if(enemy.isAlive==true){
-		fill(color(enemy.color));
-		rect(enemy.positionX, enemy.positionY, enemy.width, enemy.height);
 	}
 
 
@@ -289,8 +298,8 @@ function powerup(){
 		if(randomPowerup==0 && currentPowerup!="mitra"){
 			currentPowerup="mitra";
 			velocitaProiettili=50;
-			rateoDiFuoco=4;
-			danno=0.5;
+			rateoDiFuoco=5;
+			danno=0.7;
 			dimensioneProiettile=7;
 			isGeneratoPowerup=true;
 		}
@@ -328,6 +337,5 @@ function powerup(){
 //FINE GIOCO
 function fine(){
 	noLoop();
-	$("#fine").html('<div id="sopra" ><div id="attuale"><img src="" ><div id="tot"> </div></div><div id="record"><img src="img/trophy.png"><div id="myRecord"> </div></div></div><div id="playAgain" onclick="replay()"><img id="refresh" src="img/refresh.png"><h2>Gioca ancora</h2></div><p id="counter">0</p>")');
-	$("#myRecord").text(obstacleCounter);
+	$("#fine").show();
 }

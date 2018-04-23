@@ -6,8 +6,6 @@
 	<script src="libreries/jQuery.js"></script>
 	<script src="libreries/p5/p5.js"></script>
 	<script src="libreries/p5.collide2d.min.js"></script>
-	<script src="libreries/p5.play.js"></script>
-
 
 	<link rel="stylesheet" href="stile.css">
 	<title></title>
@@ -22,12 +20,29 @@
 
 	<script src="script.js"></script>
 
-	<div id="fine"></div>
+	<div id="fine">
+		<div id="sopra" >
+		<div id="sopra2">
+			<div id="attuale">
+				<img src="" >
+				<div id="tot"> 
+				<img src="img/trophy.png" id="trofeo" >
+					<!-- inserire punteggio attuale-->
+				</div> <!-- inserire il punteggio che ha fatto in questa sessione di gioco -->
+			</div>
+			<div id="record">
+				<img src="img/trophy.png" id="trofeo" >
+				<div id="myRecord"> </div><!-- qui aggiungi il record dell utente salvato in memoria -->
+			</div>
+			<!-- inserire immagine personaggio -->
+		</div>
+		
+		<div id="playAgain" onclick="setup()">
+			 <img id="refresh" src="img/refresh.png" /><h2>Gioca ancora</h2>
+		</div>
+	</div>
+	<p id="counter">0</p>
+	</div>
 
-	<script>
-		function replay(){
-			location.reload();
-		}
-	</Script>
 </body>
 </html>
