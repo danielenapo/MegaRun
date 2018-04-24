@@ -1,7 +1,7 @@
 //##################INIZIALIZZAZIONI#####################
 function setup(){
 		$("#all").hide();
-	
+
 	//INIZIALIZZAZIONE CANVAS E FISICA
 	larghezzaCanvas=650;
 	lunghezzaCanvas=263;
@@ -23,7 +23,8 @@ function setup(){
 	oldSpriteRun=0;
 	oldSpriteShoot=0;
 	oldSpriteShootBug=3;
-	oldSpriteJump=0;
+	contaScrittaPowerup=0;
+	scrittaPowerup="";
 
 	//INIZIALIZZAZIONE NEMICO
 	enemy=new Enemy(false,"img/player.png",30, 64, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
@@ -61,9 +62,12 @@ function setup(){
 	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FFF0", larghezzaCanvas+1000, positionYO, 0); //istanzia un nuovo ostacolo
 	obstacles.push(obstacle);
 
-
 	loop();
 }
+
+
+
+
 
 //######## AGGIORNAMENTO IMMAGINE CANVAS (draw) ##############
 function draw(){
@@ -76,44 +80,36 @@ function draw(){
 
 	noStroke();
 
-	//STAMPA GIOCATORE
-	//Se sta correndo
-	if(player.onGround==true){
+	//STAMPA GIOCATOREgt
+	if(keyIsDown(RIGHT_ARROW)){ //se sta sparando
+		oldSpriteShootBug=0;
+		if(oldSpriteShoot<=40)
+			oldSpriteShoot=40;
+	}
+	else if(!keyIsDown(RIGHT_ARROW)){
+		oldSpriteShoot=3;
+		oldSpriteShootBug=0;
+	}
+
+	if(player.onGround==true){ //se sta correndo
 		//controlli per non fa andare le sprite troppo veloce e per selezionarle
 		if (contaSprite==0){
 			oldSpriteRun=oldSpriteRun+spriteRun;
 			if(oldSpriteRun>=120 || oldSpriteRun<=32)
 				spriteRun=-1*spriteRun;
 		}
-		if(keyIsDown(RIGHT_ARROW)){ //se sta correndo e sparando
-			oldSpriteShootBug=0;
-			if(oldSpriteShoot<=40)
-				oldSpriteShoot=40;
-		}
-		else if(!keyIsDown(RIGHT_ARROW)){
-			oldSpriteShoot=3;
-			oldSpriteShootBug=0;
-		}
 		image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun,0+oldSpriteShoot,player.width/2,player.height/2+oldSpriteShootBug );
+	}
 
-	}
-	//se sta saltando
-	else{
-		if(keyIsDown(RIGHT_ARROW)){ //se sta correndo e sparando
-			if(oldSpriteJump<=40)
-				oldSpriteJump=40;
-		}
-		else if(!keyIsDown(RIGHT_ARROW))
-		 	oldSpriteJump=0;
-		image(player.sprites,player.positionX,player.positionY-10,player.width,player.height+10,110,oldSpriteJump,player.width/2,(player.height/2)+7 );
-	}
+	else //se sta saltando
+		image(player.sprites,player.positionX,player.positionY-10,player.width,player.height+10,110,oldSpriteShoot,player.width/2,(player.height/2)+7+oldSpriteShootBug );
+
 	//STAMPA PROIETTILI
 	for(var i=0; i<colpi.length; i++){
 		colpi[i].positionX+=velocitaProiettili;	//aggiorna la posizione dei proiettili
 		fill(color(colpi[i].color));
 		ellipse(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height);//disegna il personaggio
 	}
-
 
 	//STAMPA NEMICO
 	if(enemy.isAlive==true){
@@ -122,7 +118,6 @@ function draw(){
 		else
 			oldSpriteEnemy=0;
 		image(enemy.sprites,enemy.positionX,enemy.positionY,enemy.width,enemy.height,oldSpriteEnemy,80,enemy.width/2,enemy.height/2 );
-
 	}
 
 	//STAMPA OSTACOLI
@@ -132,22 +127,27 @@ function draw(){
 		rect(obstacles[i].positionX, obstacles[i].positionY, obstacles[i].width, obstacles[i].height);//disegna il personaggio
 	}
 
-
 	//STAMPA UI
 	fill(0);
 	textSize(32);
 	text(obstacleCounter, 10, 250);
 	text(currentPowerup, 500, 250);
+	if(contaScrittaPowerup!=0){
+		text(scrittaPowerup, 200,100);
+		contaScrittaPowerup--;
+	}
+
 
 	//CONTROLLI
 	controlli();
-
 }
 
-//######## CONTROLLI EFFETTUATI AD OGNI FRAME ##############
 
+
+
+
+//######## CONTROLLI EFFETTUATI AD OGNI FRAME ##############
 function controlli(){
-	
 	//CONTROLLO CONTATORI FRAME
 	contaSpara++;
 	if(contaSprite>=velocitaSprite)
@@ -215,8 +215,10 @@ function controlli(){
 	}
 
 	collisioni();
-
 }
+
+
+
 
 //CONTROLLO COLLISIONI
 function collisioni(){
@@ -270,6 +272,8 @@ function addBackground(){
 			backgrounds.splice(0,1);
 }
 
+
+//AGGIUNGE E RIMUOVE OSTACOLI DOPO CHE FINISCONO SOTTO LO 0
 function addObstacle(){
 	//gli ostacoli possono essere di due tipi: uno alto e stretto e l'altro basso e largo
 	var possibleHeight=[50, 30];
@@ -301,7 +305,9 @@ function addObstacle(){
 	}
 }
 
-//ASSEGNAZIONE DI UN POWERUP RANDOM
+
+
+//ASSEGNAZIONE DI UN POWERUP RANDOM (DOPO CHE E' STATO PRESO)
 function powerup(){
 
 	do{
@@ -314,6 +320,8 @@ function powerup(){
 			danno=0.7;
 			dimensioneProiettile=7;
 			isGeneratoPowerup=true;
+			contaScrittaPowerup=60;
+			scrittaPowerup="MITRAGLIATORE";
 		}
 		//CANNONE
 		else if(randomPowerup==1 && currentPowerup!="cannone"){
@@ -323,6 +331,8 @@ function powerup(){
 			danno=2;
 			dimensioneProiettile=25;
 			isGeneratoPowerup=true;
+			contaScrittaPowerup=60;
+			scrittaPowerup="CANNONE";
 
 		}
 		//PISTOLA
@@ -333,6 +343,8 @@ function powerup(){
 			danno=1;
 			dimensioneProiettile=10;
 			isGeneratoPowerup=true;
+			contaScrittaPowerup=60;
+			scrittaPowerup="PISTOLA";
 
 		}
 		//RALLENTATORE
@@ -340,11 +352,16 @@ function powerup(){
 			alert("rallenta velocita");
 			velocityX--;
 			isGeneratoPowerup=true;
+			contaScrittaPowerup=60;
+			scrittaPowerup="VELOCITA' RALLENTATA";
 		}
 	}while(isGeneratoPowerup==false);
 
 	isGeneratoPowerup=false;
 }
+
+
+
 
 //FINE GIOCO
 function fine(){
