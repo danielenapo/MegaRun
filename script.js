@@ -27,7 +27,7 @@ function setup(){
 	scrittaPowerup="";
 
 	//INIZIALIZZAZIONE NEMICO
-	enemy=new Enemy(false,"img/player.png",30, 64, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
+	enemy=new Enemy(false,"img/player.png",50, 84, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
 	enemy.sprites=loadImage("img/player.png");
 	fluttua=0;
 	oldSpriteEnemy=0;
@@ -117,7 +117,7 @@ function draw(){
 			oldSpriteEnemy=32;
 		else
 			oldSpriteEnemy=0;
-		image(enemy.sprites,enemy.positionX,enemy.positionY,enemy.width,enemy.height,oldSpriteEnemy,80,enemy.width/2,enemy.height/2 );
+		image(enemy.sprites,enemy.positionX,enemy.positionY,enemy.width,enemy.height,oldSpriteEnemy,80,(enemy.width-20)/2,(enemy.height-20)/2 );
 	}
 
 	//STAMPA OSTACOLI
@@ -127,13 +127,13 @@ function draw(){
 		rect(obstacles[i].positionX, obstacles[i].positionY, obstacles[i].width, obstacles[i].height);//disegna il personaggio
 	}
 
-	//STAMPA UI
+	//STAMPA INTERFACCIA UTENTE
 	fill(0);
 	textSize(32);
 	text(obstacleCounter, 10, 250);
 	text(currentPowerup, 500, 250);
 	if(contaScrittaPowerup!=0){
-		text(scrittaPowerup, 200,100);
+		text(scrittaPowerup, (larghezzaCanvas/2)-(scrittaPowerup.length*12),50);
 		contaScrittaPowerup--;
 	}
 
@@ -349,7 +349,6 @@ function powerup(){
 		}
 		//RALLENTATORE
 		else if(randomPowerup==3 && velocityX>9){
-			alert("rallenta velocita");
 			velocityX--;
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
