@@ -1,5 +1,6 @@
 //##################INIZIALIZZAZIONI#####################
 function setup(){
+		$("#all").hide();
 	
 	//INIZIALIZZAZIONE CANVAS E FISICA
 	larghezzaCanvas=650;
@@ -14,13 +15,15 @@ function setup(){
 	velocitaSprite=3;
 
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
-	var velocityY=0, height=55, width=55, positionX=30;
+	var velocityY=0, height=48, width=64, positionX=30;
 	positionYMin=lunghezzaCanvas-height-80;			// = grandezza canvas-altezza-80(per non attaccarsi al fondo)
 	player= new Player(true,velocityY, "img/player.png", height, width, "#FF0000", positionX, positionYMin, 100);
 	player.sprites=loadImage("img/player.png");
-	spriteRun=30;
+	spriteRun=32;
 	oldSpriteRun=0;
 	oldSpriteShoot=0;
+	oldSpriteShootBug=3;
+	oldSpriteJump=0;
 
 	//INIZIALIZZAZIONE NEMICO
 	enemy=new Enemy(false,"img/player.png",30, 64, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
@@ -58,7 +61,7 @@ function setup(){
 	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FFF0", larghezzaCanvas+1000, positionYO, 0); //istanzia un nuovo ostacolo
 	obstacles.push(obstacle);
 
-	$("#fine").hide();
+
 	loop();
 }
 
@@ -79,22 +82,31 @@ function draw(){
 		//controlli per non fa andare le sprite troppo veloce e per selezionarle
 		if (contaSprite==0){
 			oldSpriteRun=oldSpriteRun+spriteRun;
-			if(oldSpriteRun>=90 || oldSpriteRun<=30)
+			if(oldSpriteRun>=120 || oldSpriteRun<=32)
 				spriteRun=-1*spriteRun;
 		}
 		if(keyIsDown(RIGHT_ARROW)){ //se sta correndo e sparando
+			oldSpriteShootBug=0;
 			if(oldSpriteShoot<=40)
 				oldSpriteShoot=40;
 		}
-		else if(!keyIsDown(RIGHT_ARROW))
-		 	oldSpriteShoot=0;
-		image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun,0+oldSpriteShoot,player.width/2,player.height/2 );
+		else if(!keyIsDown(RIGHT_ARROW)){
+			oldSpriteShoot=3;
+			oldSpriteShootBug=0;
+		}
+		image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun,0+oldSpriteShoot,player.width/2,player.height/2+oldSpriteShootBug );
 
 	}
 	//se sta saltando
-	else
-		image(player.sprites,player.positionX,player.positionY-10,player.width,player.height+10,110,0,player.width/2,(player.height/2)+7 );
-
+	else{
+		if(keyIsDown(RIGHT_ARROW)){ //se sta correndo e sparando
+			if(oldSpriteJump<=40)
+				oldSpriteJump=40;
+		}
+		else if(!keyIsDown(RIGHT_ARROW))
+		 	oldSpriteJump=0;
+		image(player.sprites,player.positionX,player.positionY-10,player.width,player.height+10,110,oldSpriteJump,player.width/2,(player.height/2)+7 );
+	}
 	//STAMPA PROIETTILI
 	for(var i=0; i<colpi.length; i++){
 		colpi[i].positionX+=velocitaProiettili;	//aggiorna la posizione dei proiettili
@@ -337,5 +349,5 @@ function powerup(){
 //FINE GIOCO
 function fine(){
 	noLoop();
-	$("#fine").show();
+	$("#all").show();
 }
