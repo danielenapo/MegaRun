@@ -13,7 +13,7 @@ function Player(onGround, velocityY, sprites, height, width, color, positionX, p
 	this.positionY=positionY;
 
 	this.salta= function(){
-		this.velocityY=14;
+		this.velocityY=13;
 		this.onGround=false;
 		this.positionY-=this.velocityY;
 	}

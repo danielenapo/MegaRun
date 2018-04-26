@@ -12,10 +12,11 @@ function setup(){
 	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
 	frameRate(30);
 	gravity=1;
-	velocityX=10;
+	velocityX=12;
 	difficultyLevel=0;
 	contaSprite=0;
 	velocitaSprite=3;
+	cuore=loadImage("img/player.png");
 
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=48, width=64, positionX=30;
@@ -29,7 +30,7 @@ function setup(){
 	contaScrittaPowerup=0;
 	scrittaPowerup="";
 	contaCollisioni=60;
-	oldHealth=50;
+	oldHealth=40;
 
 
 	//INIZIALIZZAZIONE NEMICO
@@ -59,13 +60,17 @@ function setup(){
 	obstacleCounter=0;
 	obstacles=[];
 	colpi=[];
-	var possibleHeight=[50, 30];//due possibili altezze(alto e basso)
-	var possibleWidth=[30, 50];//due possibili larghezze(stretto e alto)
+	var possibleSpritesPositionX=[129, 173]
+	var possibleSpritesPositionY=[103, 94]
+	var possibleHeight=[22, 40];//due possibili altezze(alto e basso)
+	var possibleWidth=[70, 38];//due possibili larghezze(stretto e alto)
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
-	var positionYO=lunghezzaCanvas-possibleHeight[type]-80; //la posizione y si calcola come quella del giocatore
-	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FFF0", 900, positionYO, 0); //istanzia un nuovo ostacolo
+	 positionYO=lunghezzaCanvas-possibleHeight[type]-80; //la posizione y si calcola come quella del giocatore
+	var obstacle= new Obstacle("img/player.png",possibleSpritesPositionX[type],possibleSpritesPositionY[type], possibleHeight[type], possibleWidth[type], 900, positionYO, 0); //istanzia un nuovo ostacolo
+	obstacle.sprites=loadImage("img/player.png");
 	obstacles.push(obstacle);
-	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type], "#00FFF0", larghezzaCanvas+1000, positionYO, 0); //istanzia un nuovo ostacolo
+	var obstacle= new Obstacle("img/player.png",possibleSpritesPositionX[type],possibleSpritesPositionY[type], possibleHeight[type], possibleWidth[type], larghezzaCanvas+1000, positionYO, 0); //istanzia un nuovo ostacolo
+	obstacle.sprites=loadImage("img/player.png");
 	obstacles.push(obstacle);
 
 	loop();
@@ -132,25 +137,28 @@ function draw(){
 	//STAMPA OSTACOLI
 	for(var i=0; i<obstacles.length; i++){
 		obstacles[i].positionX-=velocityX;	//aggiorna la posizione degli ostacoli
-		fill(color(obstacles[i].color));
-		rect(obstacles[i].positionX, obstacles[i].positionY, obstacles[i].width, obstacles[i].height);//disegna il personaggio
+		if(obstacles[i].isSpecial==0)
+			image(obstacles[i].sprites,obstacles[i].positionX,obstacles[i].positionY,obstacles[i].width,obstacles[i].height,obstacles[i].spritePositionX,obstacles[i].spritePositionY,obstacles[i].width/2,obstacles[i].height/2 );
+		else if(obstacles[i].isSpecial==1)
+			image(obstacles[i].sprites,obstacles[i].positionX,obstacles[i].positionY,obstacles[i].width,obstacles[i].height,obstacles[i].spritePositionX,obstacles[i].spritePositionY,obstacles[i].width,obstacles[i].height);
+
 	}
 
 	//STAMPA INTERFACCIA UTENTE
 	fill(0);
 	textSize(32);
-	text(obstacleCounter, 10, 250);
-	text(currentPowerup, 500, 250);
-	if(contaScrittaPowerup!=0){
-		text(scrittaPowerup, (larghezzaCanvas/2)-(scrittaPowerup.length*12),50);
-		contaScrittaPowerup--;
-	}
+	text(obstacleCounter, 10, 30);
 	for(var i=0; i<player.health; i++){
 		fill(0);
-		rect(200+oldHealth, 230, 50, 50);
-		oldHealth+=30;
+		image(cuore, -45+oldHealth, 210, 50, 50, 150, 0, 50, 50);
+		oldHealth+=40;
 	}
-	oldHealth=30;
+	oldHealth=40;
+	if(contaScrittaPowerup!=0) {
+		contaScrittaPowerup--;
+		if (contaScrittaPowerup%20!=0)
+			text(scrittaPowerup, (larghezzaCanvas/2)-(scrittaPowerup.length*12),50);
+	}
 
 
 	//CONTROLLI
@@ -304,27 +312,27 @@ function addBackground(){
 //AGGIUNGE E RIMUOVE OSTACOLI DOPO CHE FINISCONO SOTTO LO 0
 function addObstacle(){
 	//gli ostacoli possono essere di due tipi: uno alto e stretto e l'altro basso e largo
-	var possibleHeight=[50, 30];
-	var possibleWidth=[30, 50];
+	var possibleSpritesPositionX=[129, 173, 85];
+	var possibleSpritesPositionY=[103, 94, 85];
+	var possibleHeight=[22, 40, 33];
+	var possibleWidth=[70, 38, 36];
 
 	do{
 		var positionX=Math.round(Math.random()*larghezzaCanvas); //genera la distanza del nuovo ostacolo rispetto a quello vecchio
-	}while(positionX<250);
+	}while(positionX<300);
 	positionX+=obstacles[obstacles.length-1].positionX;
-
+	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
 	var isSpecial=Math.round(Math.random()*100);
 	if(isSpecial<=90){ //10% probabilita di essere speciale
 		isSpecial=0; //non e' speciale
-		var color="#00FFF0";
 	}
 	else{
 		isSpecial=1;//è speciale
-		var color="#004440";
+		type=2;
 	}
-	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
 	var positionY=lunghezzaCanvas-possibleHeight[type]-80; //laposizione y si calcola come quella del giocatore
-	var obstacle= new Obstacle(possibleHeight[type], possibleWidth[type],color, positionX, positionY, isSpecial); //istanzia un nuovo ostacolo
-
+	var obstacle= new Obstacle("img/player.png",possibleSpritesPositionX[type],possibleSpritesPositionY[type], possibleHeight[type], possibleWidth[type], positionX, positionY, isSpecial); //istanzia un nuovo ostacolo
+	obstacle.sprites=loadImage("img/player.png");
 	obstacles.push(obstacle);
 
 	if(obstacles.length>6){ //se viene raggiunto il numero massimo di ostacoli
@@ -337,8 +345,8 @@ function addObstacle(){
 					storage.setItem("record",obstacleCounter);
 					maxObstacle=obstacleCounter;
 				}
-	    } 
-		else 
+	    }
+		else
 	        document.getElementById("con").innerHTML = "Sorry, your browser does not support web storage...";
 	}
 }
@@ -349,7 +357,7 @@ function addObstacle(){
 function powerup(){
 
 	do{
-		var randomPowerup=Math.round(Math.random()*3);
+		var randomPowerup=Math.round(Math.random()*4);
 		//MITRA
 		if(randomPowerup==0 && currentPowerup!="mitra"){
 			currentPowerup="mitra";
@@ -391,6 +399,13 @@ function powerup(){
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
 			scrittaPowerup="VELOCITA' RALLENTATA";
+		}
+		//VITA
+		else if(randomPowerup==4 && player.health<6){
+			player.health++;
+			isGeneratoPowerup=true;
+			contaScrittaPowerup=60;
+			scrittaPowerup="VITA";
 		}
 	}while(isGeneratoPowerup==false);
 
