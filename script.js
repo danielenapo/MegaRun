@@ -1,6 +1,6 @@
 //##################INIZIALIZZAZIONI#####################
-maxObstacle=0;
 storage=window.localStorage;
+storage.setItem("record", 0);
 
 function setup(){
 	$("#sopra").hide();
@@ -11,7 +11,7 @@ function setup(){
 	createCanvas(larghezzaCanvas, lunghezzaCanvas);		//id="defaultCanvas0"
 	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
 	frameRate(30);
-	gravity=1;
+	gravity=1.2;
 	velocityX=12;
 	difficultyLevel=0;
 	contaSprite=0;
@@ -93,7 +93,6 @@ function draw(){
 
 	//STAMPA GIOCATORE
 	if((contaCollisioni<60 && contaCollisioni%5!=0) || contaCollisioni==60) { //effetto lampeggia quando viene colpito
-
 		if(keyIsDown(RIGHT_ARROW)){ //se sta sparando
 			oldSpriteShootBug=0;
 			if(oldSpriteShoot<=40)
@@ -103,17 +102,22 @@ function draw(){
 			oldSpriteShoot=3;
 			oldSpriteShootBug=0;
 		}
-
 		if(player.onGround==true){ //se sta correndo
 			//controlli per non fa andare le sprite troppo veloce e per selezionarle
+	//		console.log(""spriteRun);
+			console.log(oldSpriteRun);
+
 			if (contaSprite==0){
-				oldSpriteRun=oldSpriteRun+spriteRun;
-				if(oldSpriteRun>=120 || oldSpriteRun<=32)
-					spriteRun=-1*spriteRun;
+				oldSpriteRun+=spriteRun;
+				if(oldSpriteRun>=64)
+					spriteRun=spriteRun*-1;
+				if(oldSpriteRun==0)
+					spriteRun=spriteRun*-1;
+
+
 			}
 			image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun,0+oldSpriteShoot,player.width/2,player.height/2+oldSpriteShootBug );
 		}
-
 		else //se sta saltando
 			image(player.sprites,player.positionX,player.positionY-10,player.width,player.height+10,110,oldSpriteShoot,player.width/2,(player.height/2)+7+oldSpriteShootBug );
 	}
@@ -147,17 +151,17 @@ function draw(){
 	//STAMPA INTERFACCIA UTENTE
 	fill(0);
 	textSize(32);
-	text(obstacleCounter, 10, 30);
-	for(var i=0; i<player.health; i++){
+	text(obstacleCounter, 10, 30); //contatore
+	for(var i=0; i<player.health; i++){ //cuori
 		fill(0);
 		image(cuore, -45+oldHealth, 210, 50, 50, 150, 0, 50, 50);
 		oldHealth+=40;
 	}
 	oldHealth=40;
-	if(contaScrittaPowerup!=0) {
+	if(contaScrittaPowerup!=0) {//scritte powerup
+		fill(40);
+		text(scrittaPowerup, (larghezzaCanvas/2)-(scrittaPowerup.length*10),50);
 		contaScrittaPowerup--;
-		if (contaScrittaPowerup%20!=0)
-			text(scrittaPowerup, (larghezzaCanvas/2)-(scrittaPowerup.length*12),50);
 	}
 
 
@@ -269,7 +273,7 @@ function collisioni(){
 	//collisione ostacoli-colpi
 	for(var i=0; i<obstacles.length; i++){
 		for(var j=0; j<colpi.length; j++){
-			if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width, colpi[j].height)==true){
+			if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width+10, colpi[j].height)==true){
 				colpi.splice(j,1);
 				if(obstacles[i].isSpecial==1)
 					obstacles[i].becomePowerup();
@@ -340,14 +344,8 @@ function addObstacle(){
 		obstacleCounter++;
 		var adesso=0;
 		//storage
-		if(typeof(Storage) !== "undefined") {
-				if (obstacleCounter>=maxObstacle){
+		if(typeof(Storage) !== "undefined" && obstacleCounter>=storage.getItem("record"))
 					storage.setItem("record",obstacleCounter);
-					maxObstacle=obstacleCounter;
-				}
-	    }
-		else
-	        document.getElementById("con").innerHTML = "Sorry, your browser does not support web storage...";
 	}
 }
 
