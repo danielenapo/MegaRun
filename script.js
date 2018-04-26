@@ -1,6 +1,9 @@
 //##################INIZIALIZZAZIONI#####################
+maxObstacle=0;
+storage=window.localStorage;
+
 function setup(){
-		$("#all").hide();
+	$("#sopra").hide();
 
 	//INIZIALIZZAZIONE CANVAS E FISICA
 	larghezzaCanvas=650;
@@ -17,7 +20,7 @@ function setup(){
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=48, width=64, positionX=30;
 	positionYMin=lunghezzaCanvas-height-80;			// = grandezza canvas-altezza-80(per non attaccarsi al fondo)
-	player= new Player(true,velocityY, "img/player.png", height, width, "#FF0000", positionX, positionYMin, 100);
+	player= new Player(true,velocityY, "img/player.png", height, width, "#FF0000", positionX, positionYMin, 3);
 	player.sprites=loadImage("img/player.png");
 	spriteRun=32;
 	oldSpriteRun=0;
@@ -25,6 +28,9 @@ function setup(){
 	oldSpriteShootBug=3;
 	contaScrittaPowerup=0;
 	scrittaPowerup="";
+	contaCollisioni=60;
+	oldHealth=50;
+
 
 	//INIZIALIZZAZIONE NEMICO
 	enemy=new Enemy(false,"img/player.png",50, 84, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
@@ -80,29 +86,32 @@ function draw(){
 
 	noStroke();
 
-	//STAMPA GIOCATOREgt
-	if(keyIsDown(RIGHT_ARROW)){ //se sta sparando
-		oldSpriteShootBug=0;
-		if(oldSpriteShoot<=40)
-			oldSpriteShoot=40;
-	}
-	else if(!keyIsDown(RIGHT_ARROW)){
-		oldSpriteShoot=3;
-		oldSpriteShootBug=0;
-	}
+	//STAMPA GIOCATORE
+	if((contaCollisioni<60 && contaCollisioni%5!=0) || contaCollisioni==60) { //effetto lampeggia quando viene colpito
 
-	if(player.onGround==true){ //se sta correndo
-		//controlli per non fa andare le sprite troppo veloce e per selezionarle
-		if (contaSprite==0){
-			oldSpriteRun=oldSpriteRun+spriteRun;
-			if(oldSpriteRun>=120 || oldSpriteRun<=32)
-				spriteRun=-1*spriteRun;
+		if(keyIsDown(RIGHT_ARROW)){ //se sta sparando
+			oldSpriteShootBug=0;
+			if(oldSpriteShoot<=40)
+				oldSpriteShoot=40;
 		}
-		image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun,0+oldSpriteShoot,player.width/2,player.height/2+oldSpriteShootBug );
-	}
+		else if(!keyIsDown(RIGHT_ARROW)){
+			oldSpriteShoot=3;
+			oldSpriteShootBug=0;
+		}
 
-	else //se sta saltando
-		image(player.sprites,player.positionX,player.positionY-10,player.width,player.height+10,110,oldSpriteShoot,player.width/2,(player.height/2)+7+oldSpriteShootBug );
+		if(player.onGround==true){ //se sta correndo
+			//controlli per non fa andare le sprite troppo veloce e per selezionarle
+			if (contaSprite==0){
+				oldSpriteRun=oldSpriteRun+spriteRun;
+				if(oldSpriteRun>=120 || oldSpriteRun<=32)
+					spriteRun=-1*spriteRun;
+			}
+			image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun,0+oldSpriteShoot,player.width/2,player.height/2+oldSpriteShootBug );
+		}
+
+		else //se sta saltando
+			image(player.sprites,player.positionX,player.positionY-10,player.width,player.height+10,110,oldSpriteShoot,player.width/2,(player.height/2)+7+oldSpriteShootBug );
+	}
 
 	//STAMPA PROIETTILI
 	for(var i=0; i<colpi.length; i++){
@@ -136,6 +145,12 @@ function draw(){
 		text(scrittaPowerup, (larghezzaCanvas/2)-(scrittaPowerup.length*12),50);
 		contaScrittaPowerup--;
 	}
+	for(var i=0; i<player.health; i++){
+		fill(0);
+		rect(200+oldHealth, 230, 50, 50);
+		oldHealth+=30;
+	}
+	oldHealth=30;
 
 
 	//CONTROLLI
@@ -214,10 +229,18 @@ function controlli(){
 	//se il nemico è vivo viene spostato verso sinistra e fluttua
 	}
 
-	collisioni();
+	if(player.health<=0)
+		fine();
+
+	if(contaCollisioni==60)
+		collisioni();
+
+	else if (contaCollisioni<60){
+		contaCollisioni--;
+		if(contaCollisioni<=0)
+			contaCollisioni=60;
+	}
 }
-
-
 
 
 //CONTROLLO COLLISIONI
@@ -229,8 +252,10 @@ function collisioni(){
 			powerup();
 			obstacles.splice(i,1);//elimina il powerup
 		}
-		else if(obstacles[0].isSpecial!=2)
-			fine();
+		else if(obstacles[0].isSpecial!=2){
+			player.health--;
+			contaCollisioni--;
+		}
 	}
 
 	//collisione ostacoli-colpi
@@ -258,8 +283,11 @@ function collisioni(){
 
 
 	//collisioni personaggio-nemico
-	if(player.isColliding(enemy.positionX, enemy.positionY, enemy.width, enemy.height)==true)
-		fine();
+	if(player.isColliding(enemy.positionX, enemy.positionY, enemy.width, enemy.height)==true){
+		player.health--;
+		contaCollisioni--;
+	}
+
 }
 
 //FUNZIONI CHE AGGIUNGONO DINAMICAMENTE OSTACOLI E IMMAGINE DI SFONDO
@@ -302,6 +330,16 @@ function addObstacle(){
 	if(obstacles.length>6){ //se viene raggiunto il numero massimo di ostacoli
 		obstacles.splice(0,1); //elimina il primo ostacolo (obstacles è un array FILO)
 		obstacleCounter++;
+		var adesso=0;
+		//storage
+		if(typeof(Storage) !== "undefined") {
+				if (obstacleCounter>=maxObstacle){
+					storage.setItem("record",obstacleCounter);
+					maxObstacle=obstacleCounter;
+				}
+	    } 
+		else 
+	        document.getElementById("con").innerHTML = "Sorry, your browser does not support web storage...";
 	}
 }
 
@@ -359,11 +397,9 @@ function powerup(){
 	isGeneratoPowerup=false;
 }
 
-
-
-
 //FINE GIOCO
 function fine(){
 	noLoop();
-	$("#all").show();
+	$("#sopra").show();
+	alert(storage.getItem("record"));
 }
