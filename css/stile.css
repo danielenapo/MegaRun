@@ -1,59 +1,80 @@
 body{
 	font-family: Arial,Times New Roman, Times;
 	font-size: 14px;
+	background-color: #f6f6f6;
+
 }
 #title{
 	margin: auto;
 	display: block;
 }
 #finestra{
-	margin:auto;
-	display:block;
-}
-#perso{
 	margin: auto;
 	display: block;
 }
+#sopra{
+	width: 250px;
+	height: 180px;
+
+	border-radius: 8px;
+	/*border: 1px solid red;*/
+	margin: auto;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 10;
+	background: rgb(130,227,140) url("./img/background.png") center bottom no-repeat;
+
+}
 #playAgain{
 	width: 250px;
-	height: 70px;
-	border: 1px solid black;
-	padding-left: 5px;
-	padding-bottom: 5px;
-	
+	/*border: 1px solid yellow;*/
+	height: 64px;
+	border-radius: 10px;
+	margin: auto;
 	position: absolute;
+	left: 0;
+	right: 0;
+	top: 55%;
+	bottom: 0;
+	z-index: 10;
 	background-color: lightblue;
-	border-radius: 10px; /*bordi arrotondati*/
-	-moz-border-radius: 10px; /* firefox */
-	-webkit-border-radius: 10px; /* safari, chrome */
+	cursor: pointer;
+}
+#attuale{
+	width: 31%;
+	height: 53%;
+	float: left;
+	margin: 2%;
+}
+#record{
+	width: 31%;
+	height: 53%;
+	float: left;
+	margin-right: 2%;
+	margin: 2%;
+	margin-left: 28%;
+}
+#giocatore{
+	margin: auto;
+	display: block;
+}
+#trofeo{
+	margin: auto;
+	display: block;
+}
+#rec, #att{
+	text-align: center;
+}
+
+#refresh{
+	vertical-align: middle;
+	padding-left: 2%;
 }
 h2{
 	display: inline-block;
-	vertical-align: middle; /*allineamento verticale nel mezzo*/
-	padding-left: 3%;
-}
-#refresh{
 	vertical-align: middle;
-	
+	padding-left: 2%;
 }
-#sopra{
-	border-radius: 10px; /*bordi arrotondati*/
-	-moz-border-radius: 10px; /* firefox */
-	-webkit-border-radius: 10px; /* safari, chrome */
-	width: 200px;
-	height: 100px;
-	margin: auto;
-	display: none;
-	z-index: 10;
-	background-color: green;
-	
-}
-
-#fine{
-	position:absolute;
-	display:block;
-}
-
-
-
-	

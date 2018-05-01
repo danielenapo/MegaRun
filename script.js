@@ -1,9 +1,14 @@
-//##################INIZIALIZZAZIONI#####################
+//inizializzazione storage
 storage=window.localStorage;
-storage.setItem("record", 0);
+if(storage.getItem("record")==undefined)
+	storage.setItem("record", 0);
 
+//##################INIZIALIZZAZIONI#####################
 function setup(){
 	$("#sopra").hide();
+	$("#playAgain").hide();
+	$( "*" ).unbind();
+	$("#finestra, #title").css("filter", "blur(0px)");
 
 	//INIZIALIZZAZIONE CANVAS E FISICA
 	larghezzaCanvas=650;
@@ -12,11 +17,23 @@ function setup(){
 	$("#defaultCanvas0").attr("id","finestra");	//rinomina l'id di default
 	frameRate(30);
 	gravity=1.2;
-	velocityX=12;
+	luna=false;
+	velocityX=13;
 	difficultyLevel=0;
 	contaSprite=0;
 	velocitaSprite=3;
 	cuore=loadImage("img/player.png");
+	font=loadFont("css/8-BIT WONDER.ttf");
+	bgmusic=document.getElementById("bgmusic");
+	bgmusic.volume=1.0;
+	shootfx=document.getElementById("shootfx");
+	jumpfx=document.getElementById("jumpfx");
+	pickupfx=document.getElementById("pickupfx");
+	hitfx=document.getElementById("hitfx");
+	jumpfx.volume=0.5; jumpfx.playbackRate=1;
+	shootfx.volume=0.5; shootfx.playbackRate=1;
+	bgmusic.currentTime=0; bgmusic.play();
+
 
 	//INIZIALIZZAZIONI OGGETTO PERSONAGGIO
 	var velocityY=0, height=48, width=64, positionX=30;
@@ -41,12 +58,14 @@ function setup(){
 
 	//INIZIALIZZAZIONE PROIETTILI e POWERUP
 	currentPowerup="pistola";
-	dimensioneProiettile=10;
 	danno=1;
 	rateoDiFuoco=15;
 	velocitaProiettili=30;
 	contaSpara=0;
 	isGeneratoPowerup=false;
+	larghezzaProiettile=22*2;
+	lunghezzaProiettile=9*2;
+	spriteProiettile=[29,179];
 
 	//INIZIALIZZAZIONE BACKGROUND
 	backgrounds=[];
@@ -73,23 +92,17 @@ function setup(){
 	obstacle.sprites=loadImage("img/player.png");
 	obstacles.push(obstacle);
 
+	//INIZIO LOOP GIOCO
 	loop();
 }
 
-
-
-
-
 //######## AGGIORNAMENTO IMMAGINE CANVAS (draw) ##############
 function draw(){
-
 	//STAMPA BACKGROUND
 	for(var i=0; i<backgrounds.length; i++){
 		backgrounds[i].positionX-=velocityX;
 		image(backgrounds[i].src, backgrounds[i].positionX, backgrounds[i].positionY);
 	}
-
-	noStroke();
 
 	//STAMPA GIOCATORE
 	if((contaCollisioni<60 && contaCollisioni%5!=0) || contaCollisioni==60) { //effetto lampeggia quando viene colpito
@@ -104,17 +117,12 @@ function draw(){
 		}
 		if(player.onGround==true){ //se sta correndo
 			//controlli per non fa andare le sprite troppo veloce e per selezionarle
-	//		console.log(""spriteRun);
-			console.log(oldSpriteRun);
-
 			if (contaSprite==0){
 				oldSpriteRun+=spriteRun;
 				if(oldSpriteRun>=64)
 					spriteRun=spriteRun*-1;
 				if(oldSpriteRun==0)
 					spriteRun=spriteRun*-1;
-
-
 			}
 			image(player.sprites,player.positionX,player.positionY,player.width,player.height,oldSpriteRun,0+oldSpriteShoot,player.width/2,player.height/2+oldSpriteShootBug );
 		}
@@ -125,8 +133,7 @@ function draw(){
 	//STAMPA PROIETTILI
 	for(var i=0; i<colpi.length; i++){
 		colpi[i].positionX+=velocitaProiettili;	//aggiorna la posizione dei proiettili
-		fill(color(colpi[i].color));
-		ellipse(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height);//disegna il personaggio
+		image(colpi[i].sprites, colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height, colpi[i].spritePositionX, colpi[i].spritePositionY, colpi[i].width/2, colpi[i].height/2);
 	}
 
 	//STAMPA NEMICO
@@ -145,12 +152,14 @@ function draw(){
 			image(obstacles[i].sprites,obstacles[i].positionX,obstacles[i].positionY,obstacles[i].width,obstacles[i].height,obstacles[i].spritePositionX,obstacles[i].spritePositionY,obstacles[i].width/2,obstacles[i].height/2 );
 		else if(obstacles[i].isSpecial==1)
 			image(obstacles[i].sprites,obstacles[i].positionX,obstacles[i].positionY,obstacles[i].width,obstacles[i].height,obstacles[i].spritePositionX,obstacles[i].spritePositionY,obstacles[i].width,obstacles[i].height);
-
+		else if(obstacles[i].isSpecial==2)
+			image(obstacles[i].sprites,obstacles[i].positionX,obstacles[i].positionY,obstacles[i].width,obstacles[i].height,obstacles[i].spritePositionX,obstacles[i].spritePositionY,obstacles[i].width,obstacles[i].height);
 	}
 
 	//STAMPA INTERFACCIA UTENTE
 	fill(0);
-	textSize(32);
+	textSize(30);
+	textFont(font);
 	text(obstacleCounter, 10, 30); //contatore
 	for(var i=0; i<player.health; i++){ //cuori
 		fill(0);
@@ -160,21 +169,21 @@ function draw(){
 	oldHealth=40;
 	if(contaScrittaPowerup!=0) {//scritte powerup
 		fill(40);
-		text(scrittaPowerup, (larghezzaCanvas/2)-(scrittaPowerup.length*10),50);
+		text(scrittaPowerup, (larghezzaCanvas/2)-(scrittaPowerup.length*15),50);
 		contaScrittaPowerup--;
 	}
-
 
 	//CONTROLLI
 	controlli();
 }
 
-
-
-
-
 //######## CONTROLLI EFFETTUATI AD OGNI FRAME ##############
 function controlli(){
+	//CONTROLLO COSSISIONI E SALUTE GIOCATORE
+	collisioni();
+	if(player.health<=0)
+		fine();
+
 	//CONTROLLO CONTATORI FRAME
 	contaSpara++;
 	if(contaSprite>=velocitaSprite)
@@ -184,24 +193,25 @@ function controlli(){
 
 	//CONTROLLO COMANDI PREMUTI
 	if(keyIsDown(UP_ARROW)){
-		if(player.onGround==true)
+		if(player.onGround==true){
+			jumpfx.play();
 			player.salta();
+		}
 	}
 	if(keyIsDown(RIGHT_ARROW)&& contaSpara>rateoDiFuoco){
-		var colpo= new Proiettile(dimensioneProiettile, dimensioneProiettile, "#000000", player.positionX+(player.width/2), player.positionY+(player.height/2));
+		var colpo= new Proiettile("img/player.png", spriteProiettile[0], spriteProiettile[1], lunghezzaProiettile, larghezzaProiettile, player.positionX+(player.width/2)-10, player.positionY+(player.height/2)-10);
+		colpo.sprites=loadImage("img/player.png");
 		colpi.push(colpo);
 		contaSpara=0;
+		shootfx.play();
 	}
 
 	//CONTROLLO DIFFICOLTA' DI GIOCO
-	//la velocita aumenta di 0.5 ogni 10 ostacoli saltati
-	if(difficultyLevel%2==0 && (obstacleCounter+1)%10==0){
+	if(difficultyLevel%2==0 && (obstacleCounter+1)%10==0){ 	//la velocita aumenta di 0.5 ogni 10 ostacoli saltati
 		velocityX+=0.5;
 		difficultyLevel++;
 	}
-
-	//spawna un nemico 5 salti di ostacoli dopo velocità aumentata
-	if(difficultyLevel%2!=0 && (obstacleCounter+1)%7==0 && (obstacleCounter+1)%10!=0){
+	if(difficultyLevel%2!=0 && (obstacleCounter+1)%7==0 && (obstacleCounter+1)%10!=0){ 	//spawna un nemico 5 salti di ostacoli dopo velocità aumentata
 		enemy.alive();
 		difficultyLevel++;
 	}
@@ -229,48 +239,21 @@ function controlli(){
 	//CONTROLLO PROIETTILI
 	if(colpi[0]!= undefined){
 		if(colpi[0].positionX>larghezzaCanvas)
-			colpi.splice(0,1);
-			//se i colpi finiscono fuori dal canvas, vengono tolti
+			colpi.splice(0,1); 			//se i colpi finiscono fuori dal canvas, vengono tolti
+
 	}
 
 	//CONTROLLO NEMICO
 	if(enemy.isAlive==true){
 		fluttua+=0.1;
-		enemy.positionX-=3;
-		enemy.positionY=((Math.sin(fluttua))*20)+100;
-	//se il nemico è vivo viene spostato verso sinistra e fluttua
-	}
-
-	if(player.health<=0)
-		fine();
-
-	if(contaCollisioni==60)
-		collisioni();
-
-	else if (contaCollisioni<60){
-		contaCollisioni--;
-		if(contaCollisioni<=0)
-			contaCollisioni=60;
+		enemy.positionX-=4;
+		enemy.positionY=((Math.sin(fluttua))*30)+100; 	//se il nemico è vivo viene spostato verso sinistra e fluttua
 	}
 }
 
-
-//CONTROLLO COLLISIONI
+//######## CONTROLLO COLLISIONI #################
 function collisioni(){
-
-	//collisioni personaggio-ostacoli (e personaggio-powerups)
-	if(player.isColliding(obstacles[0].positionX, obstacles[0].positionY, obstacles[0].width, obstacles[0].height)==true){
-		if(obstacles[0].isSpecial==2){
-			powerup();
-			obstacles.splice(i,1);//elimina il powerup
-		}
-		else if(obstacles[0].isSpecial!=2){
-			player.health--;
-			contaCollisioni--;
-		}
-	}
-
-	//collisione ostacoli-colpi
+	//OSTACOLI - COLPI
 	for(var i=0; i<obstacles.length; i++){
 		for(var j=0; j<colpi.length; j++){
 			if(obstacles[i].isColliding(colpi[j].positionX, colpi[j].positionY, colpi[j].width+10, colpi[j].height)==true){
@@ -281,11 +264,12 @@ function collisioni(){
 		}
 	}
 
-	//collisioni nemico-colpi
+	//NEMICO - COLPI
 	if(enemy.isAlive==true){
 		for(var i=0; i<colpi.length; i++){
 			if(enemy.isColliding(colpi[i].positionX, colpi[i].positionY, colpi[i].width, colpi[i].height)==true){
 				enemy.health-=danno;
+				hitfx.play();
 				colpi.splice(i,1);
 				if(enemy.health<=0)
 					enemy.die();
@@ -293,13 +277,35 @@ function collisioni(){
 		}
 	}
 
+	//PERSONAGGIO - POWERUP
+	if(player.isColliding(obstacles[0].positionX, obstacles[0].positionY, obstacles[0].width, obstacles[0].height)==true && obstacles[0].isSpecial==2){
+			obstacles.splice(0,1);//elimina il powerup
+			powerup();
+			pickupfx.play();
+		}
 
-	//collisioni personaggio-nemico
-	if(player.isColliding(enemy.positionX, enemy.positionY, enemy.width, enemy.height)==true){
-		player.health--;
-		contaCollisioni--;
+	//queste collisioni non si controllano se il giocatore è appena stato colpito
+	if(contaCollisioni==60){
+		//PERSONAGGIO - OSTACOLI
+		if(player.isColliding(obstacles[0].positionX, obstacles[0].positionY, obstacles[0].width, obstacles[0].height)==true && obstacles[0].isSpecial!=2){
+			hitfx.play();
+			player.health--;
+			contaCollisioni--;
+		}
+
+		//PERSONAGGIO - NEMICO
+		if(player.isColliding(enemy.positionX, enemy.positionY, enemy.width, enemy.height)==true){
+			player.health--;
+			hitfx.play();
+			contaCollisioni--;
+		}
 	}
 
+	else if (contaCollisioni<60){
+		contaCollisioni--;
+		if(contaCollisioni<=0)
+			contaCollisioni=60;
+	}
 }
 
 //FUNZIONI CHE AGGIUNGONO DINAMICAMENTE OSTACOLI E IMMAGINE DI SFONDO
@@ -311,7 +317,6 @@ function addBackground(){
 		if(backgrounds.length>=4)
 			backgrounds.splice(0,1);
 }
-
 
 //AGGIUNGE E RIMUOVE OSTACOLI DOPO CHE FINISCONO SOTTO LO 0
 function addObstacle(){
@@ -327,7 +332,7 @@ function addObstacle(){
 	positionX+=obstacles[obstacles.length-1].positionX;
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
 	var isSpecial=Math.round(Math.random()*100);
-	if(isSpecial<=90){ //10% probabilita di essere speciale
+	if(isSpecial<=95){ //5% probabilita di essere speciale
 		isSpecial=0; //non e' speciale
 	}
 	else{
@@ -343,26 +348,23 @@ function addObstacle(){
 		obstacles.splice(0,1); //elimina il primo ostacolo (obstacles è un array FILO)
 		obstacleCounter++;
 		var adesso=0;
-		//storage
-		if(typeof(Storage) !== "undefined" && obstacleCounter>=storage.getItem("record"))
-					storage.setItem("record",obstacleCounter);
 	}
 }
 
-
-
 //ASSEGNAZIONE DI UN POWERUP RANDOM (DOPO CHE E' STATO PRESO)
 function powerup(){
-
 	do{
-		var randomPowerup=Math.round(Math.random()*4);
+		var randomPowerup=Math.round(Math.random()*5);
 		//MITRA
 		if(randomPowerup==0 && currentPowerup!="mitra"){
 			currentPowerup="mitra";
+			shootfx.playbackRate=3;
 			velocitaProiettili=50;
 			rateoDiFuoco=5;
 			danno=0.7;
-			dimensioneProiettile=7;
+			larghezzaProiettile=7*2;
+			lunghezzaProiettile=4*2;
+			spriteProiettile=[17,157];
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
 			scrittaPowerup="MITRAGLIATORE";
@@ -370,10 +372,13 @@ function powerup(){
 		//CANNONE
 		else if(randomPowerup==1 && currentPowerup!="cannone"){
 			currentPowerup="cannone";
+			shootfx.playbackRate=0.6;
 			velocitaProiettili=25;
 			rateoDiFuoco=30;
 			danno=2;
-			dimensioneProiettile=25;
+			larghezzaProiettile=32*2;
+			lunghezzaProiettile=20*2;
+			spriteProiettile=[35,226];
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
 			scrittaPowerup="CANNONE";
@@ -382,37 +387,62 @@ function powerup(){
 		//PISTOLA
 		else if(randomPowerup==2 && currentPowerup!="pistola"){
 			currentPowerup="pistola";
+			shootfx.playbackRate=1;
 			velocitaProiettili=30;
 			rateoDiFuoco=15;
 			danno=1;
-			dimensioneProiettile=10;
+			larghezzaProiettile=22*2;
+			lunghezzaProiettile=9*2;
+			spriteProiettile=[29,179];
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
 			scrittaPowerup="PISTOLA";
 
 		}
 		//RALLENTATORE
-		else if(randomPowerup==3 && velocityX>9){
+		else if(randomPowerup==3 && velocityX>14){
 			velocityX--;
 			isGeneratoPowerup=true;
-			contaScrittaPowerup=60;
-			scrittaPowerup="VELOCITA' RALLENTATA";
+			scrittaPowerup="VELOCITA RALLENTATA";
 		}
 		//VITA
-		else if(randomPowerup==4 && player.health<6){
+		else if(randomPowerup==4 && player.health<5){
 			player.health++;
 			isGeneratoPowerup=true;
-			contaScrittaPowerup=60;
 			scrittaPowerup="VITA";
 		}
+		//GRAVITA
+		else if(randomPowerup==5 && luna==false){
+			gravity=0.9;
+			jumpfx.playbackRate=0.6;
+			isGeneratoPowerup=true;
+			scrittaPowerup="GRAVITA LUNARE";
+			luna=true;
+		}
+		else if(randomPowerup==5 && luna==true){
+			gravity=1.2;
+			jumpfx.playbackRate=1;
+			isGeneratoPowerup=true;
+			scrittaPowerup="GRAVITA NORAMLE";
+			luna=false;
+		}
 	}while(isGeneratoPowerup==false);
-
+	
+	contaScrittaPowerup=60;
 	isGeneratoPowerup=false;
 }
 
 //FINE GIOCO
 function fine(){
 	noLoop();
+	velocityX=0; gravity=0;
+	bgmusic.pause();
+	if(obstacleCounter>=storage.getItem("record")) //aggiornamento localStorage
+				storage.setItem("record",obstacleCounter);
 	$("#sopra").show();
-	alert(storage.getItem("record"));
+	$("#playAgain").show();
+	$("#finestra, #title").css("filter", "blur(7px)");
+	document.getElementById("att").innerHTML=obstacleCounter;
+	document.getElementById("rec").innerHTML=storage.getItem("record");
+	setTimeout(function(){$( "*" ).keypress(function() { setup()});}, 500);
 }

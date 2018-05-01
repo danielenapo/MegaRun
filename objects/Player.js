@@ -19,7 +19,7 @@ function Player(onGround, velocityY, sprites, height, width, color, positionX, p
 	}
 
 	this.isColliding=function(killerPositionX, killerPositionY, killerWidth, killerHeight){
-		if(collideRectRect(this.positionX,this.positionY,this.width-10,this.height,
+		if(collideRectRect(this.positionX+20,this.positionY,this.width-20,this.height,
 							killerPositionX,killerPositionY,killerWidth,killerHeight))
 			return true;
 		else
