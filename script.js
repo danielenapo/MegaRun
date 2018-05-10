@@ -2,13 +2,13 @@
 storage=window.localStorage;
 if(storage.getItem("record")==undefined)
 	storage.setItem("record", 0);
-
+larghezzaPagina=$(window).width();  
 //##################INIZIALIZZAZIONI#####################
 function setup(){
 	$("#sopra").hide();
 	$("#playAgain").hide();
 	$( "*" ).unbind();
-	$("#finestra, #title").css("filter", "blur(0px)");
+	$("#finestra").css("filter", "blur(0px)");
 
 	//INIZIALIZZAZIONE CANVAS E FISICA
 	larghezzaCanvas=650;
@@ -49,7 +49,6 @@ function setup(){
 	contaCollisioni=60;
 	oldHealth=40;
 
-
 	//INIZIALIZZAZIONE NEMICO
 	enemy=new Enemy(false,"img/player.png",50, 84, "#0000FF", larghezzaCanvas, (lunghezzaCanvas-(lunghezzaCanvas/3)), 2 );
 	enemy.sprites=loadImage("img/player.png");
@@ -84,7 +83,7 @@ function setup(){
 	var possibleHeight=[22, 40];//due possibili altezze(alto e basso)
 	var possibleWidth=[70, 38];//due possibili larghezze(stretto e alto)
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
-	 positionYO=lunghezzaCanvas-possibleHeight[type]-80; //la posizione y si calcola come quella del giocatore
+	positionYO=lunghezzaCanvas-possibleHeight[type]-80; //la posizione y si calcola come quella del giocatore
 	var obstacle= new Obstacle("img/player.png",possibleSpritesPositionX[type],possibleSpritesPositionY[type], possibleHeight[type], possibleWidth[type], 900, positionYO, 0); //istanzia un nuovo ostacolo
 	obstacle.sprites=loadImage("img/player.png");
 	obstacles.push(obstacle);
@@ -98,6 +97,8 @@ function setup(){
 
 //######## AGGIORNAMENTO IMMAGINE CANVAS (draw) ##############
 function draw(){
+	//CONTROLLI
+	controlli();
 	//STAMPA BACKGROUND
 	for(var i=0; i<backgrounds.length; i++){
 		backgrounds[i].positionX-=velocityX;
@@ -157,28 +158,31 @@ function draw(){
 	}
 
 	//STAMPA INTERFACCIA UTENTE
-	fill(0);
+	if((obstacleCounter >= storage.getItem("record")) && (storage.getItem("record")>0))
+		fill(209, 74, 66);
+	else 
+		fill(0,0,0);
 	textSize(30);
 	textFont(font);
 	text(obstacleCounter, 10, 30); //contatore
 	for(var i=0; i<player.health; i++){ //cuori
-		fill(0);
+		fill(0,0,0);
 		image(cuore, -45+oldHealth, 210, 50, 50, 150, 0, 50, 50);
 		oldHealth+=40;
 	}
 	oldHealth=40;
 	if(contaScrittaPowerup!=0) {//scritte powerup
-		fill(40);
+		fill(0,0,0);
 		text(scrittaPowerup, (larghezzaCanvas/2)-(scrittaPowerup.length*15),50);
 		contaScrittaPowerup--;
 	}
 
-	//CONTROLLI
-	controlli();
+
 }
 
 //######## CONTROLLI EFFETTUATI AD OGNI FRAME ##############
 function controlli(){
+
 	//CONTROLLO COSSISIONI E SALUTE GIOCATORE
 	collisioni();
 	if(player.health<=0)
@@ -192,18 +196,20 @@ function controlli(){
 		contaSprite++;
 
 	//CONTROLLO COMANDI PREMUTI
-	if(keyIsDown(UP_ARROW)){
+	if(keyIsDown(UP_ARROW)|| (mouseX<=larghezzaPagina/2 && mouseIsPressed)){
 		if(player.onGround==true){
 			jumpfx.play();
 			player.salta();
 		}
 	}
-	if(keyIsDown(RIGHT_ARROW)&& contaSpara>rateoDiFuoco){
-		var colpo= new Proiettile("img/player.png", spriteProiettile[0], spriteProiettile[1], lunghezzaProiettile, larghezzaProiettile, player.positionX+(player.width/2)-10, player.positionY+(player.height/2)-10);
-		colpo.sprites=loadImage("img/player.png");
-		colpi.push(colpo);
-		contaSpara=0;
-		shootfx.play();
+	if(keyIsDown(RIGHT_ARROW) || (mouseX>larghezzaPagina/2 && mouseIsPressed)){
+		if(contaSpara>rateoDiFuoco){
+			var colpo= new Proiettile("img/player.png", spriteProiettile[0], spriteProiettile[1], lunghezzaProiettile, larghezzaProiettile, player.positionX+(player.width/2)-10, player.positionY+(player.height/2)-10);
+			colpo.sprites=loadImage("img/player.png");
+			colpi.push(colpo);
+			contaSpara=0;
+			shootfx.play();
+		}
 	}
 
 	//CONTROLLO DIFFICOLTA' DI GIOCO
@@ -239,7 +245,7 @@ function controlli(){
 	//CONTROLLO PROIETTILI
 	if(colpi[0]!= undefined){
 		if(colpi[0].positionX>larghezzaCanvas)
-			colpi.splice(0,1); 			//se i colpi finiscono fuori dal canvas, vengono tolti
+			colpi.splice(0,1); 			//se i colpi finiscono fuori dal canvas, vengono tolti (42)
 
 	}
 
@@ -368,6 +374,7 @@ function powerup(){
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
 			scrittaPowerup="MITRAGLIATORE";
+			luna=false;
 		}
 		//CANNONE
 		else if(randomPowerup==1 && currentPowerup!="cannone"){
@@ -382,6 +389,7 @@ function powerup(){
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
 			scrittaPowerup="CANNONE";
+			luna=false;
 
 		}
 		//PISTOLA
@@ -397,6 +405,7 @@ function powerup(){
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
 			scrittaPowerup="PISTOLA";
+			luna=false;
 
 		}
 		//RALLENTATORE
@@ -404,12 +413,14 @@ function powerup(){
 			velocityX--;
 			isGeneratoPowerup=true;
 			scrittaPowerup="VELOCITA RALLENTATA";
+			luna=false;
 		}
 		//VITA
 		else if(randomPowerup==4 && player.health<5){
 			player.health++;
 			isGeneratoPowerup=true;
 			scrittaPowerup="VITA";
+			luna=false;
 		}
 		//GRAVITA
 		else if(randomPowerup==5 && luna==false){
@@ -427,7 +438,7 @@ function powerup(){
 			luna=false;
 		}
 	}while(isGeneratoPowerup==false);
-	
+
 	contaScrittaPowerup=60;
 	isGeneratoPowerup=false;
 }
@@ -441,7 +452,7 @@ function fine(){
 				storage.setItem("record",obstacleCounter);
 	$("#sopra").show();
 	$("#playAgain").show();
-	$("#finestra, #title").css("filter", "blur(7px)");
+	$("#finestra").css("filter", "blur(7px)");
 	document.getElementById("att").innerHTML=obstacleCounter;
 	document.getElementById("rec").innerHTML=storage.getItem("record");
 	setTimeout(function(){$( "*" ).keypress(function() { setup()});}, 500);

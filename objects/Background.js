@@ -6,5 +6,4 @@ function Background(height, width, src, positionX, positionY){
 	//dati posizione iniziale
 	this.positionX=positionX;
 	this.positionY=positionY;	
-
 }

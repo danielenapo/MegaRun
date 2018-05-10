@@ -1,60 +1,56 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="UTF-8">
-	<script src="libreries/jQuery.js"></script>
-	<script src="libreries/p5/p5.js"></script>
-	<script src="libreries/p5.collide2d.min.js"></script>
-	<title>MegaRun</title>
-	<link rel="icon" href="img/favicon.ico" />
-	<link href="css/stile.css" rel="stylesheet" type="text/css">
-</head>
-<body>
 
-	<script src="objects/Player.js"></script>
-	<script src="objects/Obstacle.js"></script>
-	<script src="objects/Proiettile.js"></script>
-	<script src="objects/Enemy.js"></script>
-	<script src="objects/Background.js"></script>
-	<script src="script.js"></script>
+	<head>
+		<meta charset="UTF-8">
+		<script src="libreries/jQuery.js"></script>
+		<script src="libreries/p5.min.js"></script>
+		<script src="libreries/p5.collide2d.min.js"></script>
+		<title>MegaRun</title>
+		<link rel="icon" href="img/favicon.ico" />
+		<link href="css/stile.css" rel="stylesheet" type="text/css">
+	</head>
 
-	<img src="img/title.png" id="title"/>
-	<!-- risorse audio !-->
-	<audio id='bgmusic' controls autoplay='true' hidden='hidden' loop='true' >
-		<source src='sound/Temple_run.mp3' type='audio/mp3'>
-	</audio>
-	<audio id='jumpfx'>
-		<source src='sound/jump.wav' type='audio/wav'>
-	</audio>
-	<audio id='shootfx' >
-		<source src='sound/laser.wav' type='audio/wav'>
-	</audio>
-	<audio id='pickupfx'>
-		<source src='sound/pickup.wav' type='audio/wav'>
-	</audio>
-	<audio id='hitfx'>
-		<source src='sound/hit.wav' type='audio/wav'>
-	</audio>
-	<!-- div di fine gioco !-->
-	<div id="sopra">
-			<div id="attuale">
-				<img src="img/giocatore.png" id="giocatore" >
-				<div  id="att">
+	<body>
+		<!--script!-->
+		<script src="objects/Player.js"></script>
+		<script src="objects/Obstacle.js"></script>
+		<script src="objects/Proiettile.js"></script>
+		<script src="objects/Enemy.js"></script>
+		<script src="objects/Background.js"></script>
+		<script src="script.js"></script>
+		<img src="img/title.png" id="title"/>
 
-					<!-- inserire punteggio attuale-->
+		<!-- risorse audio !-->
+		<audio id='bgmusic' controls autoplay='true' hidden='hidden' loop='true' >
+			<source src='sound/background.mp3' type='audio/mp3'>
+		</audio>
+		<audio id='jumpfx'>
+			<source src='sound/jump.wav' type='audio/wav'>
+		</audio>
+		<audio id='shootfx' >
+			<source src='sound/laser.wav' type='audio/wav'>
+		</audio>
+		<audio id='pickupfx'>
+			<source src='sound/pickup.wav' type='audio/wav'>
+		</audio>
+		<audio id='hitfx'>
+			<source src='sound/hit.wav' type='audio/wav'>
+		</audio>
+
+		<!-- div di fine gioco !-->
+		<div id="sopra">
+				<div id="attuale">
+					<img src="img/giocatore.png" id="giocatore" >
+					<div  id="att"></div><!-- punteggio attuale-->
 				</div>
-			</div>
-			<div id="record">
-				<img src="img/trophy.png" id="trofeo" >
-				<div  id="rec"> </div><!-- qui aggiungi il record dell utente salvato in memoria -->
-			</div>
-			<!-- inserire immagine personaggio -->
+				<div id="record">
+					<img src="img/trophy.png" id="trofeo" >
+					<div  id="rec"> </div><!--record salvato in memoria -->
+				</div>
 		</div>
-
-		<div id="playAgain" onclick="setup()"> <!-- funzione da finire -->
+		<div id="playAgain" onclick="setup()">
 			 <img id="refresh" src="img/refresh.png" /><h2>Gioca ancora</h2>
-		 </div>
-
-
-</body>
+		</div>
+	</body>
 </html>

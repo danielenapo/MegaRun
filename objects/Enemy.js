@@ -10,7 +10,7 @@ function Enemy(isAlive, sprites, height, width, color, positionX, positionY, hea
 	//dati posizione iniziale
 	this.positionX=positionX;
 	this.positionY=positionY;
-	
+
 	this.die=function(){
 		//resetta i valori delle proprietà
 		this.positionX=700;
@@ -21,13 +21,12 @@ function Enemy(isAlive, sprites, height, width, color, positionX, positionY, hea
 	this.alive=function(){
 		this.isAlive=true;
 	}
-	
+
 	this.isColliding=function(killerPositionX, killerPositionY, killerWidth, killerHeight){
 		if(collideRectCircle(this.positionX,this.positionY,this.width,this.height,killerPositionX,killerPositionY,killerWidth,killerHeight))
 			return true;
-		else 
+		else
 			return false;
 	}
-	
-	
+		
 }
