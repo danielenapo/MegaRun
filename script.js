@@ -1,8 +1,10 @@
+//Copyright (C) 2018  Napolitano Daniele
+
 //inizializzazione storage
 storage=window.localStorage;
 if(storage.getItem("record")==undefined)
 	storage.setItem("record", 0);
-larghezzaPagina=$(window).width();  
+larghezzaPagina=$(window).width();
 //##################INIZIALIZZAZIONI#####################
 function setup(){
 	$("#sopra").hide();
@@ -160,7 +162,7 @@ function draw(){
 	//STAMPA INTERFACCIA UTENTE
 	if((obstacleCounter >= storage.getItem("record")) && (storage.getItem("record")>0))
 		fill(209, 74, 66);
-	else 
+	else
 		fill(0,0,0);
 	textSize(30);
 	textFont(font);

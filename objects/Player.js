@@ -1,3 +1,5 @@
+//Copyright (C) 2018  Napolitano Daniele
+
 //OGGETTO DEL PERSONAGGIO
 function Player(onGround, velocityY, sprites, height, width, color, positionX, positionY, health){
 	this.onGround=onGround; //bool che controlla se sta saltando

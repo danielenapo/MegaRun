@@ -1,3 +1,5 @@
+//Copyright (C) 2018  Napolitano Daniele
+
 //OGGETTO COLPI
 function Proiettile(sprites, spritePositionX, spritePositionY, height, width, positionX, positionY){
 	//dati forma fisica

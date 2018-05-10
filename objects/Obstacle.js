@@ -1,3 +1,5 @@
+//Copyright (C) 2018  Napolitano Daniele
+
 //OGGETTO OSTACOLI
 function Obstacle(sprites, spritePositionX, spritePositionY, height, width, positionX, positionY, isSpecial){
 	//dati forma fisica

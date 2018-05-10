@@ -1,3 +1,5 @@
+//Copyright (C) 2018  Napolitano Daniele
+
 function Background(height, width, src, positionX, positionY){
 	//dati forma fisica
 	this.height=height;
@@ -5,5 +7,5 @@ function Background(height, width, src, positionX, positionY){
 	this.src=src;
 	//dati posizione iniziale
 	this.positionX=positionX;
-	this.positionY=positionY;	
+	this.positionY=positionY;
 }

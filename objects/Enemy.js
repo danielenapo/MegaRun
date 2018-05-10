@@ -1,3 +1,5 @@
+//Copyright (C) 2018  Napolitano Daniele
+
 //OGGETTO DEL NEMICO
 function Enemy(isAlive, sprites, height, width, color, positionX, positionY, health){
 	//dati forma fisica
@@ -28,5 +30,5 @@ function Enemy(isAlive, sprites, height, width, color, positionX, positionY, hea
 		else
 			return false;
 	}
-		
+
 }
