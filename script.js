@@ -20,7 +20,7 @@ function setup(){
 	frameRate(30);
 	gravity=1.2;
 	luna=false;
-	velocityX=13;
+	velocityX=14;
 	difficultyLevel=0;
 	contaSprite=0;
 	velocitaSprite=3;
@@ -335,8 +335,9 @@ function addObstacle(){
 	var possibleWidth=[70, 38, 36];
 
 	do{
-		var positionX=Math.round(Math.random()*larghezzaCanvas); //genera la distanza del nuovo ostacolo rispetto a quello vecchio
-	}while(positionX<300);
+		var positionX=Math.round(Math.random()*larghezzaCanvas)+(velocityX*10); //genera la distanza del nuovo ostacolo rispetto a quello vecchio
+	}while(positionX<300+(velocityX*5));
+	
 	positionX+=obstacles[obstacles.length-1].positionX;
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
 	var isSpecial=Math.round(Math.random()*100);
@@ -362,7 +363,7 @@ function addObstacle(){
 //ASSEGNAZIONE DI UN POWERUP RANDOM (DOPO CHE E' STATO PRESO)
 function powerup(){
 	do{
-		var randomPowerup=Math.round(Math.random()*5);
+		var randomPowerup=Math.round(Math.random()*6);
 		//MITRA
 		if(randomPowerup==0 && currentPowerup!="mitra"){
 			currentPowerup="mitra";
@@ -377,6 +378,7 @@ function powerup(){
 			contaScrittaPowerup=60;
 			scrittaPowerup="MITRAGLIATORE";
 			luna=false;
+			gravity=1.2;
 		}
 		//CANNONE
 		else if(randomPowerup==1 && currentPowerup!="cannone"){
@@ -392,6 +394,7 @@ function powerup(){
 			contaScrittaPowerup=60;
 			scrittaPowerup="CANNONE";
 			luna=false;
+			gravity=1.2;
 
 		}
 		//PISTOLA
@@ -408,6 +411,7 @@ function powerup(){
 			contaScrittaPowerup=60;
 			scrittaPowerup="PISTOLA";
 			luna=false;
+			gravity=1.2;
 
 		}
 		//RALLENTATORE
@@ -416,6 +420,7 @@ function powerup(){
 			isGeneratoPowerup=true;
 			scrittaPowerup="VELOCITA RALLENTATA";
 			luna=false;
+			gravity=1.2;
 		}
 		//VITA
 		else if(randomPowerup==4 && player.health<5){
@@ -423,6 +428,7 @@ function powerup(){
 			isGeneratoPowerup=true;
 			scrittaPowerup="VITA";
 			luna=false;
+			gravity=1.2;
 		}
 		//GRAVITA
 		else if(randomPowerup==5 && luna==false){
@@ -438,6 +444,10 @@ function powerup(){
 			isGeneratoPowerup=true;
 			scrittaPowerup="GRAVITA NORAMLE";
 			luna=false;
+		}
+		else if(randomPowerup==6){
+			scrittaPowerup="NIENTE";
+			gravity=1.2;
 		}
 	}while(isGeneratoPowerup==false);
 
