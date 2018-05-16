@@ -232,6 +232,10 @@ function controlli(){
 	if(obstacles[0].positionX<-100)
 		addObstacle();
 
+	//"RIMOZIONE" NEMICO
+	if(enemy.isAlive==true && enemy.positionX<-200)
+		enemy.die(); //sono un assassino :(
+
 	//AGGIORNA POSIZIONE Y GIOCATORE (SALTO)
 	if(player.positionY>=positionYMin){
 		player.onGround=true;
@@ -253,9 +257,11 @@ function controlli(){
 
 	//CONTROLLO NEMICO
 	if(enemy.isAlive==true){
-		fluttua+=0.1;
+		fluttua+=0.03;
 		enemy.positionX-=4;
-		enemy.positionY=((Math.sin(fluttua))*30)+100; 	//se il nemico è vivo viene spostato verso sinistra e fluttua
+		//enemy.positionY=((Math.sin(fluttua))*30)+100; 	//se il nemico è vivo viene spostato verso sinistra e fluttua
+		enemy.positionY= map(noise(fluttua),0,1,0,lunghezzaCanvas-130);
+		console.log(enemy.positionY);
 	}
 }
 
@@ -337,7 +343,7 @@ function addObstacle(){
 	do{
 		var positionX=Math.round(Math.random()*larghezzaCanvas)+(velocityX*10); //genera la distanza del nuovo ostacolo rispetto a quello vecchio
 	}while(positionX<300+(velocityX*5));
-	
+
 	positionX+=obstacles[obstacles.length-1].positionX;
 	var type=Math.round(Math.random());	//sceglie che tipo di ostacolo generare
 	var isSpecial=Math.round(Math.random()*100);
