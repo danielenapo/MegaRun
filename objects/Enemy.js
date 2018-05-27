@@ -1,7 +1,7 @@
 //Copyright (C) 2018  Napolitano Daniele
 
 //OGGETTO DEL NEMICO
-function Enemy(isAlive, sprites, height, width, color, positionX, positionY, health){
+function Enemy(isAlive, sprites, height, width, color, positionX, positionY, health, type){
 	//dati forma fisica
 	this.isAlive;
 	this.sprites=sprites;
@@ -12,6 +12,8 @@ function Enemy(isAlive, sprites, height, width, color, positionX, positionY, hea
 	//dati posizione iniziale
 	this.positionX=positionX;
 	this.positionY=positionY;
+	//tipo nemico
+	this.type=type;
 
 	this.die=function(){
 		//resetta i valori delle proprietà
@@ -22,6 +24,7 @@ function Enemy(isAlive, sprites, height, width, color, positionX, positionY, hea
 
 	this.alive=function(){
 		this.isAlive=true;
+		this.type=Math.round(Math.random());
 	}
 
 	this.isColliding=function(killerPositionX, killerPositionY, killerWidth, killerHeight){

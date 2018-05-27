@@ -5,7 +5,13 @@ storage=window.localStorage;
 if(storage.getItem("record")==undefined)
 	storage.setItem("record", 0);
 larghezzaPagina=$(window).width();
-//##################INIZIALIZZAZIONI#####################
+
+//inizializzazione font
+function preload(){
+	font=loadFont("css/8BIT.TTF");
+}
+
+//##################INIZIALIZZAZIONI VARIABLI DI GIOCO#####################
 function setup(){
 	$("#sopra").hide();
 	$("#playAgain").hide();
@@ -26,7 +32,6 @@ function setup(){
 	invincibleCounter=0;
 	velocitaSprite=3;
 	cuore=loadImage("img/player.png");
-	font=loadFont("css/8-BIT WONDER.ttf");
 	bgmusic=document.getElementById("bgmusic");
 	bgmusic.volume=1.0;
 	shootfx=document.getElementById("shootfx");
@@ -60,7 +65,7 @@ function setup(){
 	oldSpriteEnemy=0;
 
 	//INIZIALIZZAZIONE PROIETTILI e POWERUP
-	currentPowerup="pistola";
+	currentPowerup="gun";
 	danno=1;
 	rateoDiFuoco=15;
 	velocitaProiettili=30;
@@ -110,7 +115,7 @@ function draw(){
 	}
 
 	//STAMPA GIOCATORE
-	if(((contaCollisioni<60 && contaCollisioni%5!=0) || contaCollisioni==60) || (invincbleCounter>0 && invinciblieCounter%5!=0)) { //effetto lampeggia quando viene colpito
+	if(((contaCollisioni<60 && contaCollisioni%5!=0) || contaCollisioni==60) || (invincibleCounter>0 && invinciblieCounter%5!=0)) { //effetto lampeggia quando viene colpito
 		if(keyIsDown(RIGHT_ARROW)){ //se sta sparando
 			oldSpriteShootBug=0;
 			if(oldSpriteShoot<=40)
@@ -215,6 +220,12 @@ function controlli(){
 			shootfx.play();
 		}
 	}
+	
+	if(keyIsDown(27)){
+		noLoop();
+		scrittaPowerup="PAUSE";
+		$("*").keypress(function(){loop()});
+	}
 
 	//CONTROLLO DIFFICOLTA' DI GIOCO
 	if(difficultyLevel%2==0 && (obstacleCounter+1)%10==0){ 	//la velocita aumenta di 0.5 ogni 10 ostacoli saltati
@@ -259,17 +270,18 @@ function controlli(){
 
 	//CONTROLLO NEMICO
 	if(enemy.isAlive==true){
-		if(enemy.type==0){
+		//if(enemy.type==0){
 			fluttua+=0.03;
 			enemy.positionX-=4;
 			//enemy.positionY=((Math.sin(fluttua))*30)+100; 	//se il nemico è vivo viene spostato verso sinistra e fluttua
 			enemy.positionY= map(noise(fluttua),0,1,0,lunghezzaCanvas-130);
-		}
-		else{
-			fluttua+=0.03;
-			enemy.positionX-=6;
-			enemy.positionY=((Math.sin(fluttua))*30)+100; 	//se il nemico è vivo viene spostato verso sinistra e fluttua
-		}
+		//}
+		/*else{
+			//fluttua+=0.5;
+			enemy.positionX-=8;
+			//enemy.positionY=((Math.sin(fluttua))*30)+100; 	//se il nemico è vivo viene spostato verso sinistra e fluttua
+			enemy.positionY=(lunghezzaCanvas/2)-40;	
+		}*/
 	}
 }
 
@@ -380,11 +392,11 @@ function addObstacle(){
 //ASSEGNAZIONE DI UN POWERUP RANDOM (DOPO CHE E' STATO PRESO)
 function powerup(){
 	do{
-		var randomPowerup=Math.round(Math.random()*8);
+		var randomPowerup=Math.round(Math.random()*9);
 		var abbassaProbLuna=Math.round(Math.random());
 		//MITRA
-		if(randomPowerup==0 && currentPowerup!="mitra"){
-			currentPowerup="mitra";
+		if(randomPowerup==0 && currentPowerup!="minigun"){
+			currentPowerup="minigun";
 			shootfx.playbackRate=3;
 			velocitaProiettili=50;
 			rateoDiFuoco=5;
@@ -394,13 +406,13 @@ function powerup(){
 			spriteProiettile=[17,157];
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
-			scrittaPowerup="MITRAGLIATORE";
+			scrittaPowerup="MINIGUN";
 			luna=false;
 			gravity=1.2;
 		}
 		//CANNONE
-		else if(randomPowerup==1 && currentPowerup!="cannone"){
-			currentPowerup="cannone";
+		else if(randomPowerup==1 && currentPowerup!="cannon"){
+			currentPowerup="cannon";
 			shootfx.playbackRate=0.6;
 			velocitaProiettili=25;
 			rateoDiFuoco=30;
@@ -410,14 +422,14 @@ function powerup(){
 			spriteProiettile=[35,226];
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
-			scrittaPowerup="CANNONE";
+			scrittaPowerup="CANNON";
 			luna=false;
 			gravity=1.2;
 
 		}
 		//PISTOLA
-		else if(randomPowerup==2 && currentPowerup!="pistola"){
-			currentPowerup="pistola";
+		else if(randomPowerup==2 && currentPowerup!="gun"){
+			currentPowerup="gun";
 			shootfx.playbackRate=1;
 			velocitaProiettili=30;
 			rateoDiFuoco=15;
@@ -427,7 +439,7 @@ function powerup(){
 			spriteProiettile=[29,179];
 			isGeneratoPowerup=true;
 			contaScrittaPowerup=60;
-			scrittaPowerup="PISTOLA";
+			scrittaPowerup="GUN";
 			luna=false;
 			gravity=1.2;
 
@@ -436,7 +448,7 @@ function powerup(){
 		else if(randomPowerup==3 && velocityX>14){
 			velocityX--;
 			isGeneratoPowerup=true;
-			scrittaPowerup="VELOCITA RALLENTATA";
+			scrittaPowerup="SLOWER";
 			luna=false;
 			gravity=1.2;
 		}
@@ -444,7 +456,7 @@ function powerup(){
 		else if(randomPowerup==4 && player.health<5){
 			player.health++;
 			isGeneratoPowerup=true;
-			scrittaPowerup="VITA";
+			scrittaPowerup="HEALTH";
 			luna=false;
 			gravity=1.2;
 		}
@@ -453,25 +465,25 @@ function powerup(){
 			gravity=0.9;
 			jumpfx.playbackRate=0.6;
 			isGeneratoPowerup=true;
-			scrittaPowerup="GRAVITA LUNARE";
+			scrittaPowerup="MOON GRAVITY";
 			luna=true;
 		}
 		else if(randomPowerup==5 && luna==true){
 			gravity=1.2;
 			jumpfx.playbackRate=1;
 			isGeneratoPowerup=true;
-			scrittaPowerup="GRAVITA NORAMLE";
+			scrittaPowerup="NORMAL GRAVITY";
 			luna=false;
 		}
 		//NIENTE
 		else if(randomPowerup==6){
-			scrittaPowerup="NIENTE";
+			scrittaPowerup="NOTHING";
 			gravity=1.2;
 		}
 		//invincibilita
 		else if(randomPowerup==7){
-			scrittaPowerup="INVINCIBILE PER 10s";
-			invincbleCounter=10*30;
+			scrittaPowerup="INVINCIBLE FOR 10s";
+			invincibleCounter=10*30;
 			gravity=1.2;
 		}
 
