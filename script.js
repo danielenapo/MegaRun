@@ -232,11 +232,11 @@ function controlli(){
 
     //CONTROLLO COMANDI TOUCHSCREEN
     for (var i = 0; i < touches.length; i++) {
-        if (touches[i] <= (larghezzaPagina / 2)) {
+        if (touches[i].x <= (larghezzaPagina / 2)) {
             jumpfx.play();
             player.salta();
         }
-        else if (touches[i] > (larghezzaPagina / 2)) {
+        if (touches[i].x > (larghezzaPagina / 2)) {
             if (contaSpara > rateoDiFuoco) {
                 var colpo = new Proiettile("img/player.png", spriteProiettile[0], spriteProiettile[1], lunghezzaProiettile, larghezzaProiettile, player.positionX + (player.width / 2) - 10, player.positionY + (player.height / 2) - 10);
                 colpo.sprites = loadImage("img/player.png");
