@@ -6,24 +6,7 @@ if(storage.getItem("record")==undefined)
 	storage.setItem("record", 0);
 larghezzaPagina=$(window).width();
 
-function touchStarted() {
-    for (var i = 0; i < touches.length; i++) {
-        if (touches[i].x <= (larghezzaPagina / 2) && player.onGround==true) {
-            jumpfx.play();
-            player.salta();
-        }
-        if (touches[i].x > (larghezzaPagina / 2)) {
-            if (contaSpara > rateoDiFuoco) {
-                var colpo = new Proiettile("img/player.png", spriteProiettile[0], spriteProiettile[1], lunghezzaProiettile, larghezzaProiettile, player.positionX + (player.width / 2) - 10, player.positionY + (player.height / 2) - 10);
-                colpo.sprites = loadImage("img/player.png");
-                colpi.push(colpo);
-                contaSpara = 0;
-                shootfx.play();
-            }
-        }
-    }
 
-}
 
 //##################INIZIALIZZAZIONI VARIABLI DI GIOCO#####################
 function setup() {
@@ -527,4 +510,26 @@ function fine(){
 	document.getElementById("att").innerHTML=obstacleCounter;
 	document.getElementById("rec").innerHTML=storage.getItem("record");
 	setTimeout(function(){$( "*" ).keypress(function() { setup()});}, 500);
+}
+
+
+function touchStarted() {
+    for (var i = 0; i < touches.length; i++) {
+        if (touches[i].x <= (larghezzaPagina / 2)){
+            if (player.onGround == true) {
+                jumpfx.play();
+                player.salta();
+            }
+        }
+        if (touches[i].x > (larghezzaPagina / 2)) {
+            if (contaSpara > rateoDiFuoco) {
+                var colpo = new Proiettile("img/player.png", spriteProiettile[0], spriteProiettile[1], lunghezzaProiettile, larghezzaProiettile, player.positionX + (player.width / 2) - 10, player.positionY + (player.height / 2) - 10);
+                colpo.sprites = loadImage("img/player.png");
+                colpi.push(colpo);
+                contaSpara = 0;
+                shootfx.play();
+            }
+        }
+    }
+
 }
