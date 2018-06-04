@@ -7,6 +7,21 @@ if(storage.getItem("record")==undefined)
 larghezzaPagina=$(window).width();
 
 function touchStarted() {
+    for (var i = 0; i < touches.length; i++) {
+        if (touches[i].x <= (larghezzaPagina / 2)) {
+            jumpfx.play();
+            player.salta();
+        }
+        if (touches[i].x > (larghezzaPagina / 2)) {
+            if (contaSpara > rateoDiFuoco) {
+                var colpo = new Proiettile("img/player.png", spriteProiettile[0], spriteProiettile[1], lunghezzaProiettile, larghezzaProiettile, player.positionX + (player.width / 2) - 10, player.positionY + (player.height / 2) - 10);
+                colpo.sprites = loadImage("img/player.png");
+                colpi.push(colpo);
+                contaSpara = 0;
+                shootfx.play();
+            }
+        }
+    }
 
 }
 
@@ -231,21 +246,7 @@ function controlli(){
     }*/
 
     //CONTROLLO COMANDI TOUCHSCREEN
-    for (var i = 0; i < touches.length; i++) {
-        if (touches[i].x <= (larghezzaPagina / 2)) {
-            jumpfx.play();
-            player.salta();
-        }
-        if (touches[i].x > (larghezzaPagina / 2)) {
-            if (contaSpara > rateoDiFuoco) {
-                var colpo = new Proiettile("img/player.png", spriteProiettile[0], spriteProiettile[1], lunghezzaProiettile, larghezzaProiettile, player.positionX + (player.width / 2) - 10, player.positionY + (player.height / 2) - 10);
-                colpo.sprites = loadImage("img/player.png");
-                colpi.push(colpo);
-                contaSpara = 0;
-                shootfx.play();
-            }
-        }
-    }
+ 
 
 	//CONTROLLO DIFFICOLTA' DI GIOCO
 	if(difficultyLevel%2==0 && (obstacleCounter+1)%10==0){ 	//la velocita aumenta di 0.5 ogni 10 ostacoli saltati
