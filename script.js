@@ -8,7 +8,7 @@ larghezzaPagina=$(window).width();
 
 function touchStarted() {
     for (var i = 0; i < touches.length; i++) {
-        if (touches[i].x <= (larghezzaPagina / 2)) {
+        if (touches[i].x <= (larghezzaPagina / 2) && player.onGround==true) {
             jumpfx.play();
             player.salta();
         }
