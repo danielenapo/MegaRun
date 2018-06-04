@@ -6,13 +6,13 @@ if(storage.getItem("record")==undefined)
 	storage.setItem("record", 0);
 larghezzaPagina=$(window).width();
 
-//inizializzazione font
-function preload(){
-	font=loadFont("css/8BIT.TTF");
+function touchStarted() {
+
 }
 
 //##################INIZIALIZZAZIONI VARIABLI DI GIOCO#####################
-function setup(){
+function setup() {
+
 	$("#sopra").hide();
 	$("#playAgain").hide();
 	$( "*" ).unbind();
@@ -30,7 +30,8 @@ function setup(){
 	difficultyLevel=0;
 	contaSprite=0;
 	invincibleCounter=0;
-	velocitaSprite=3;
+    velocitaSprite = 3;
+    font = loadFont("css/8BIT.TTF");
 	cuore=loadImage("img/player.png");
 	bgmusic=document.getElementById("bgmusic");
 	bgmusic.volume=1.0;
@@ -204,14 +205,14 @@ function controlli(){
 	else
 		contaSprite++;
 
-	//CONTROLLO COMANDI PREMUTI
-	if(keyIsDown(UP_ARROW)|| (mouseX<=larghezzaPagina/2 && mouseIsPressed)){
+	//CONTROLLO COMANDI CONTROLLER/TASTIERA
+    if (keyIsDown(UP_ARROW)){
 		if(player.onGround==true){
 			jumpfx.play();
 			player.salta();
 		}
 	}
-	if(keyIsDown(RIGHT_ARROW) || (mouseX>larghezzaPagina/2 && mouseIsPressed)){
+    if (keyIsDown(RIGHT_ARROW)){ 
 		if(contaSpara>rateoDiFuoco){
 			var colpo= new Proiettile("img/player.png", spriteProiettile[0], spriteProiettile[1], lunghezzaProiettile, larghezzaProiettile, player.positionX+(player.width/2)-10, player.positionY+(player.height/2)-10);
 			colpo.sprites=loadImage("img/player.png");
@@ -220,12 +221,31 @@ function controlli(){
 			shootfx.play();
 		}
 	}
-	
+
+    //PAUSA
+    /*
 	if(keyIsDown(27)){
 		noLoop();
 		scrittaPowerup="PAUSE";
 		$("*").keypress(function(){loop()});
-	}
+    }*/
+
+    //CONTROLLO COMANDI TOUCHSCREEN
+    for (var i = 0; i < touches.length; i++) {
+        if (touches[i] <= (larghezzaPagina / 2)) {
+            jumpfx.play();
+            player.salta();
+        }
+        else if (touches[i] > (larghezzaPagina / 2)) {
+            if (contaSpara > rateoDiFuoco) {
+                var colpo = new Proiettile("img/player.png", spriteProiettile[0], spriteProiettile[1], lunghezzaProiettile, larghezzaProiettile, player.positionX + (player.width / 2) - 10, player.positionY + (player.height / 2) - 10);
+                colpo.sprites = loadImage("img/player.png");
+                colpi.push(colpo);
+                contaSpara = 0;
+                shootfx.play();
+            }
+        }
+    }
 
 	//CONTROLLO DIFFICOLTA' DI GIOCO
 	if(difficultyLevel%2==0 && (obstacleCounter+1)%10==0){ 	//la velocita aumenta di 0.5 ogni 10 ostacoli saltati
