@@ -1,20 +1,17 @@
 # megarun
+### Platform shooter with horizontal scrolling and roguelike elements.
+_Copyright (C) 2018 Napolitano Daniele_<br>
+<img src="megaRun.gif"/>
 
-Copyright (C) 2018  Napolitano Daniele
+- **TOUCHSCREEN CONTROLS:** Tap left side of the screen to jump, tap right side to shoot.
+- **PC CONTROLS:** Press up arrow to jump, press right arrow to shoot.
 
-platform shooter a scorrimento orizzontale con elementi roguelike.
+## WIKI:
+Crates must be shot, otherwise damage is taken. If what they release is collected, special powers are acquired:
 
-COMANDI TOUCHSCREEN:
-toccare a sinistra dello schermo per saltare, a destra per sparare.
-
-COMANDI PC:
-frecia in alto per saltare, freccia a destra per sparare.
-
-WIKI:
-le casse vanno sparate, altrimenti si prende danno. Se si raccoglie quello che rilasciano, si acqiosiscono dei poteri speciali:
--pistola (danno normale)
--mitra(poco danno, maggior rateo e maggior velocità, proiettili più piccoli)
--cannone(molto danno, minor rateo e lenti, proiettili molto grandi)
--cuore
--velocità di gioco rallentata
--gravità lunare(l'effetto si rimuove quando si prende un altro powerup)
+- Pistol (normal damage)
+- Submachine gun (low damage, high rate of fire and speed, small bullets)
+- Cannon (high damage, low rate of fire and slow, very large bullets)
+- Heart
+ Slowed game speed
+- Lunar gravity (effect is removed when another powerup is acquired)
